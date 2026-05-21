@@ -1,0 +1,12 @@
+<view class="container">
+  <view class="banner">
+    <image src="/images/banner.jpg" mode="aspectFill"></image>
+  </view>
+  
+  <view class="section">
+    <view class="section-title">热门土地</view>
+    <view class="land-list">
+      <navigator url="/pages/land/list" class="more">查看更多 ></navigator>
+    </view>
+  </view>
+</view>

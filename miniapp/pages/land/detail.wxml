@@ -1,0 +1,14 @@
+<view class="container">
+  <view class="land-detail">
+    <image class="land-image" src="{{land.images}}" mode="aspectFill"></image>
+    <view class="land-info">
+      <view class="land-name">{{land.name}}</view>
+      <view class="land-location">{{land.location}}</view>
+      <view class="land-area">{{land.area}}㎡</view>
+      <view class="land-price">¥{{land.price}}/年</view>
+      <view class="land-desc">{{land.description}}</view>
+    </view>
+  </view>
+  
+  <button class="claim-btn" bindtap="createOrder">立即认领</button>
+</view>

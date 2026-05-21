@@ -1,0 +1,16 @@
+<view class="container">
+  <view class="filter">
+    <input class="search-input" placeholder="搜索土地" />
+  </view>
+  
+  <view class="land-list">
+    <view class="land-item" wx:for="{{list}}" wx:key="id">
+      <image class="land-image" src="{{item.images}}" mode="aspectFill"></image>
+      <view class="land-info">
+        <view class="land-name">{{item.name}}</view>
+        <view class="land-location">{{item.location}}</view>
+        <view class="land-price">¥{{item.price}}/年</view>
+      </view>
+    </view>
+  </view>
+</view>

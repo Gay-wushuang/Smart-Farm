@@ -1,0 +1,11 @@
+<view class="container">
+  <view class="monitor-container">
+    <image class="monitor-image" src="{{monitorUrl}}" mode="aspectFill"></image>
+    <view class="monitor-info">
+      <view class="monitor-title">实时监控</view>
+      <view class="monitor-time">更新时间：{{updateTime}}</view>
+    </view>
+  </view>
+  
+  <button class="refresh-btn" bindtap="refresh">刷新</button>
+</view>

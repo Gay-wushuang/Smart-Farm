@@ -1,0 +1,47 @@
+.container {
+  padding: 20rpx;
+}
+
+.land-image {
+  width: 100%;
+  height: 400rpx;
+  border-radius: 16rpx;
+}
+
+.land-info {
+  margin-top: 30rpx;
+}
+
+.land-name {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.land-location, .land-area {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.land-price {
+  font-size: 48rpx;
+  color: #ff6b35;
+  font-weight: bold;
+  margin: 30rpx 0;
+}
+
+.land-desc {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+.claim-btn {
+  width: 100%;
+  background: #34a853;
+  color: white;
+  border-radius: 50rpx;
+  margin-top: 60rpx;
+}

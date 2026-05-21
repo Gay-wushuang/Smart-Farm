@@ -1,0 +1,157 @@
+openapi: 3.0.0
+info:
+  title: 智慧农场 API
+  description: 智慧农场土地认领系统接口文档
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: 本地开发服务器
+
+paths:
+  /api/user/login:
+    post:
+      tags:
+        - 用户管理
+      summary: 微信登录
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 微信code
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: string
+
+  /api/user/info:
+    get:
+      tags:
+        - 用户管理
+      summary: 获取用户信息
+      responses:
+        '200':
+          description: 成功
+
+  /api/land/list:
+    get:
+      tags:
+        - 土地管理
+      summary: 获取土地列表
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功
+
+  /api/land/detail/{id}:
+    get:
+      tags:
+        - 土地管理
+      summary: 获取土地详情
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功
+
+  /api/order/create:
+    post:
+      tags:
+        - 订单管理
+      summary: 创建认领订单
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                landId:
+                  type: integer
+      responses:
+        '200':
+          description: 成功
+
+  /api/order/list:
+    get:
+      tags:
+        - 订单管理
+      summary: 获取订单列表
+      responses:
+        '200':
+          description: 成功
+
+  /api/device/list:
+    get:
+      tags:
+        - 设备管理
+      summary: 获取设备列表
+      parameters:
+        - name: landId
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功
+
+  /api/device/control:
+    post:
+      tags:
+        - 设备管理
+      summary: 控制设备（浇水/施肥）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deviceId:
+                  type: integer
+                action:
+                  type: string
+      responses:
+        '200':
+          description: 成功
+
+  /api/device/monitor/{deviceId}:
+    get:
+      tags:
+        - 设备管理
+      summary: 获取监控画面
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功

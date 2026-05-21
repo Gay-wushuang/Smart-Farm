@@ -1,0 +1,26 @@
+<view class="container">
+  <view class="form">
+    <view class="form-item">
+      <view class="label">预约时间</view>
+      <picker mode="date" value="{{date}}" bindchange="onDateChange">
+        <view class="picker">{{date || '请选择日期'}}</view>
+      </picker>
+    </view>
+    
+    <view class="form-item">
+      <view class="label">服务类型</view>
+      <radio-group bindchange="onTypeChange">
+        <radio value="plant">人工种植</radio>
+        <radio value="harvest">人工收割</radio>
+        <radio value="other">其他服务</radio>
+      </radio-group>
+    </view>
+    
+    <view class="form-item">
+      <view class="label">备注</view>
+      <textarea class="textarea" placeholder="请输入备注" bindinput="onRemarkInput" />
+    </view>
+    
+    <button class="submit-btn" bindtap="submit">提交预约</button>
+  </view>
+</view>

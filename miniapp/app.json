@@ -1,0 +1,41 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/login/login",
+    "pages/land/list",
+    "pages/land/detail",
+    "pages/order/create",
+    "pages/my/my-land",
+    "pages/monitor/monitor",
+    "pages/device/control",
+    "pages/appointment/appointment",
+    "pages/renew/renew"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#34a853",
+    "navigationBarTitleText": "智慧农场",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#34a853",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/land/list",
+        "text": "土地"
+      },
+      {
+        "pagePath": "pages/my/my-land",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
