@@ -35,3 +35,6 @@ mcp.json
 .env.local
 .env.*.local
 
+# Keep skill config (uses env vars)
+!.trae/skills/**/mcp.json
+
