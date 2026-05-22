@@ -1,9 +1,24 @@
-import request from '../utils/request.js'
+const request = require('../utils/request.js')
 
-export const getLandList = (params) => {
-  return request.get('/api/land/list', params);
+const getLandList = (params) => {
+  return request.get('/lands', params);
 }
 
-export const getLandDetail = (id) => {
-  return request.get(`/api/land/detail/${id}`);
+const getLandDetail = (id) => {
+  return request.get(`/lands/${id}`);
+}
+
+const claimLand = (id, data) => {
+  return request.post(`/lands/${id}/claim`, data, { authRequired: true });
+}
+
+const getLandMonitor = (id, params) => {
+  return request.get(`/lands/${id}/monitor`, params);
+}
+
+module.exports = {
+  getLandList,
+  getLandDetail,
+  claimLand,
+  getLandMonitor
 }

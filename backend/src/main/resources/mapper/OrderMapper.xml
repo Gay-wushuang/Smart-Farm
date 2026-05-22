@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wisdom.farm.mapper.OrderMapper">
+    <resultMap id="OrderResultMap" type="com.wisdom.farm.entity.Order">
+        <id property="id" column="id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="userId" column="user_id"/>
+        <result property="landId" column="land_id"/>
+        <result property="amount" column="amount"/>
+        <result property="status" column="status"/>
+        <result property="statusText" column="status_text"/>
+        <result property="serviceType" column="service_type"/>
+        <result property="quantity" column="quantity"/>
+        <result property="remark" column="remark"/>
+        <result property="payTime" column="pay_time"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="acceptTime" column="accept_time"/>
+        <result property="completeTime" column="complete_time"/>
+        <result property="operatorId" column="operator_id"/>
+        <result property="operatorName" column="operator_name"/>
+        <result property="completeImages" column="complete_images"/>
+        <result property="completeRemark" column="complete_remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `order` (
+            order_no, user_id, land_id, amount, status, status_text,
+            service_type, quantity, remark, start_time, end_time
+        )
+        VALUES (
+            #{orderNo}, #{userId}, #{landId}, #{amount}, #{status}, #{statusText},
+            #{serviceType}, #{quantity}, #{remark}, #{startTime}, #{endTime}
+        )
+    </insert>
+
+    <select id="selectList" resultMap="OrderResultMap">
+        SELECT id, order_no, user_id, land_id, amount, status,
+               COALESCE(status_text, CASE status WHEN 1 THEN 'PAID' WHEN 2 THEN 'CANCELLED' ELSE 'PENDING_PAY' END) AS status_text,
+               service_type, quantity, remark, pay_time, start_time, end_time,
+               accept_time, complete_time, operator_id, operator_name, complete_images, complete_remark,
+               create_time, update_time
+        FROM `order`
+        <where>
+            <if test="userId != null">
+                user_id = #{userId}
+            </if>
+            <if test="status != null">
+                AND COALESCE(status_text, CASE status WHEN 1 THEN 'PAID' WHEN 2 THEN 'CANCELLED' ELSE 'PENDING_PAY' END) = #{status}
+            </if>
+            <if test="serviceType != null and serviceType != ''">
+                AND service_type = #{serviceType}
+            </if>
+            <if test="startDate != null">
+                AND DATE(create_time) &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND DATE(create_time) &lt;= #{endDate}
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultMap="OrderResultMap">
+        SELECT id, order_no, user_id, land_id, amount, status,
+               COALESCE(status_text, CASE status WHEN 1 THEN 'PAID' WHEN 2 THEN 'CANCELLED' ELSE 'PENDING_PAY' END) AS status_text,
+               service_type, quantity, remark, pay_time, start_time, end_time,
+               accept_time, complete_time, operator_id, operator_name, complete_images, complete_remark,
+               create_time, update_time
+        FROM `order`
+        WHERE id = #{id}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE `order`
+        SET status = #{status},
+            status_text = #{statusText},
+            accept_time = COALESCE(#{acceptTime}, accept_time)
+        WHERE id = #{id}
+    </update>
+
+    <update id="complete">
+        UPDATE `order`
+        SET status = #{status},
+            status_text = #{statusText},
+            complete_time = #{completeTime},
+            complete_images = #{completeImages},
+            complete_remark = #{completeRemark}
+        WHERE id = #{id}
+    </update>
+
+    <select id="count" resultType="long">
+        SELECT COUNT(*) FROM `order`
+        <where>
+            <if test="status != null">
+                COALESCE(status_text, CASE status WHEN 1 THEN 'PAID' WHEN 2 THEN 'CANCELLED' ELSE 'PENDING_PAY' END) = #{status}
+            </if>
+            <if test="serviceType != null and serviceType != ''">
+                AND service_type = #{serviceType}
+            </if>
+            <if test="startDate != null">
+                AND DATE(create_time) &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND DATE(create_time) &lt;= #{endDate}
+            </if>
+        </where>
+    </select>
+</mapper>

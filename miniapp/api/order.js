@@ -1,13 +1,24 @@
-import request from '../utils/request.js'
+const request = require('../utils/request.js')
 
-export const createOrder = (data) => {
-  return request.post('/api/order/create', data);
+const createOrder = (data) => {
+  return request.post('/orders', data, { authRequired: true });
 }
 
-export const getOrderList = (params) => {
-  return request.get('/api/order/list', params);
+const getOrderList = (params) => {
+  return request.get('/user/orders', params, { authRequired: true });
 }
 
-export const getOrderDetail = (id) => {
-  return request.get(`/api/order/detail/${id}`);
+const getOrderDetail = (id) => {
+  return request.get(`/orders/${id}`, {}, { authRequired: true });
+}
+
+const cancelOrder = (id) => {
+  return request.put(`/orders/${id}/cancel`, {}, { authRequired: true });
+}
+
+module.exports = {
+  createOrder,
+  getOrderList,
+  getOrderDetail,
+  cancelOrder
 }

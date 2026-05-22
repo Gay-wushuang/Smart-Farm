@@ -1,13 +1,13 @@
 <view class="container">
   <view class="my-list">
-    <view class="my-item" wx:for="{{list}}" wx:key="id">
-      <image class="land-image" src="{{item.images}}" mode="aspectFill"></image>
+    <view class="my-item" wx:for="{{list}}" wx:key="claimId">
+      <image class="land-image" src="{{item.landImage}}" mode="aspectFill"></image>
       <view class="land-info">
-        <view class="land-name">{{item.name}}</view>
-        <view class="land-time">租期至：{{item.endTime}}</view>
+        <view class="land-name">{{item.landName}}</view>
+        <view class="land-time">租期至：{{item.expireTime}}</view>
         <view class="land-actions">
-          <button class="action-btn" size="mini" bindtap="goMonitor">查看监控</button>
-          <button class="action-btn" size="mini" bindtap="goControl">远程操作</button>
+          <button class="action-btn" size="mini" bindtap="goMonitor" data-land-id="{{item.landId}}">查看监控</button>
+          <button class="action-btn" size="mini" bindtap="goControl" data-land-id="{{item.landId}}">远程操作</button>
         </view>
       </view>
     </view>

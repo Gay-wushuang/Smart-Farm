@@ -4,13 +4,17 @@
   </view>
   
   <view class="land-list">
-    <view class="land-item" wx:for="{{list}}" wx:key="id">
-      <image class="land-image" src="{{item.images}}" mode="aspectFill"></image>
+    <view class="land-item" wx:for="{{list}}" wx:key="landId">
+      <image class="land-image" src="{{item.image}}" mode="aspectFill"></image>
       <view class="land-info">
-        <view class="land-name">{{item.name}}</view>
-        <view class="land-location">{{item.location}}</view>
-        <view class="land-price">¥{{item.price}}/年</view>
+        <view class="land-name">{{item.landName}}</view>
+        <view class="land-location">{{item.zone}}</view>
+        <view class="land-price">¥{{item.price}}{{item.priceUnit}}</view>
       </view>
     </view>
   </view>
+
+  <view class="state" wx:if="{{loading}}">加载中...</view>
+  <view class="state error" wx:elif="{{errorText}}">{{errorText}}</view>
+  <view class="state" wx:elif="{{!list.length}}">暂无土地数据</view>
 </view>

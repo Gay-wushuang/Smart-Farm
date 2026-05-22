@@ -1,11 +1,13 @@
 <view class="container">
   <view class="device-list">
-    <view class="device-item" wx:for="{{devices}}" wx:key="id">
-      <view class="device-name">{{item.name}}</view>
-      <view class="device-status">状态：{{item.status === 1 ? '在线' : '离线'}}</view>
+    <view class="device-item">
+      <view class="device-name">土地 {{landId}} 监测</view>
+      <view class="device-status">温度：{{monitor.temperature}}℃</view>
+      <view class="device-status">空气湿度：{{monitor.humidity}}%</view>
+      <view class="device-status">土壤湿度：{{monitor.soilMoisture}}%</view>
       <view class="device-actions">
-        <button class="action-btn water" bindtap="doAction" data-action="water" data-id="{{item.id}}" wx:if="{{item.type === 'water'}}">浇水</button>
-        <button class="action-btn fertilizer" bindtap="doAction" data-action="fertilizer" data-id="{{item.id}}" wx:if="{{item.type === 'fertilizer'}}">施肥</button>
+        <button class="action-btn water" bindtap="doAction" data-action="water">浇水</button>
+        <button class="action-btn fertilizer" bindtap="doAction" data-action="fertilizer">施肥</button>
       </view>
     </view>
   </view>

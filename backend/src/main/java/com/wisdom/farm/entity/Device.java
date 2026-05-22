@@ -10,6 +10,7 @@ public class Device {
     private String name;
     private String type;
     private String sn;
+    private String secret;
     private Integer status;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
