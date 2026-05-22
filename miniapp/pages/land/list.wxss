@@ -56,3 +56,14 @@
   color: #ff6b35;
   font-weight: bold;
 }
+
+.state {
+  padding: 48rpx 0;
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
+}
+
+.state.error {
+  color: #e64340;
+}

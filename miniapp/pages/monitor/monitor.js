@@ -1,15 +1,21 @@
+const { getLandMonitor } = require('../../api/land.js')
+
 Page({
   data: {
-    monitorUrl: '',
+    landId: null,
+    monitor: {},
     updateTime: ''
   },
   
-  onLoad() {
+  onLoad(options) {
+    this.setData({ landId: options.landId || 1 });
     this.refresh();
   },
   
-  refresh() {
+  async refresh() {
+    const res = await getLandMonitor(this.data.landId);
     this.setData({
+      monitor: res.data.latest || {},
       updateTime: new Date().toLocaleString()
     });
   }

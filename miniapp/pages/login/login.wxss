@@ -1,0 +1,24 @@
+.page {
+  min-height: 100vh;
+  padding: 160rpx 48rpx 48rpx;
+  box-sizing: border-box;
+  background: #f6fbf7;
+}
+
+.title {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #1f7a3f;
+}
+
+.subtitle {
+  margin-top: 20rpx;
+  margin-bottom: 80rpx;
+  color: #667085;
+  font-size: 28rpx;
+}
+
+.primary {
+  background: #34a853;
+  color: #ffffff;
+}

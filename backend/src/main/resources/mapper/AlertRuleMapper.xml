@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wisdom.farm.mapper.AlertRuleMapper">
+    <resultMap id="AlertRuleResultMap" type="com.wisdom.farm.entity.AlertRule">
+        <id property="id" column="id"/>
+        <result property="landId" column="land_id"/>
+        <result property="metric" column="metric"/>
+        <result property="minValue" column="min_value"/>
+        <result property="maxValue" column="max_value"/>
+        <result property="enabled" column="enabled"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="selectEnabled" resultMap="AlertRuleResultMap">
+        SELECT id, land_id, metric, min_value, max_value, enabled, create_time, update_time
+        FROM alert_rule
+        WHERE enabled = 1 AND (land_id IS NULL OR land_id = #{landId})
+    </select>
+</mapper>

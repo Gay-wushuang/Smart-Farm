@@ -16,13 +16,29 @@ function request(options) {
         if (res.statusCode === 200) {
           if (res.data.code === 200) {
             resolve(res.data);
+          } else if (res.data.code === 0) {
+            resolve(res.data);
           } else {
             wx.showToast({
-              title: res.data.message || '请求失败',
+              title: res.data.msg || '请求失败',
               icon: 'none'
             });
             reject(res.data);
           }
+        } else if (res.statusCode === 401) {
+          wx.removeStorageSync('token');
+          wx.showToast({
+            title: '请先登录',
+            icon: 'none'
+          });
+          if (options.authRequired) {
+            const pages = getCurrentPages();
+            const currentRoute = pages.length ? pages[pages.length - 1].route : '';
+            if (currentRoute !== 'pages/login/login') {
+              wx.navigateTo({ url: '/pages/login/login' });
+            }
+          }
+          reject(res);
         } else {
           wx.showToast({
             title: '网络错误',
@@ -42,17 +58,17 @@ function request(options) {
   });
 }
 
-export default {
-  get(url, data) {
-    return request({ url, method: 'GET', data });
+module.exports = {
+  get(url, data, config) {
+    return request({ url, method: 'GET', data, ...(config || {}) });
   },
-  post(url, data) {
-    return request({ url, method: 'POST', data });
+  post(url, data, config) {
+    return request({ url, method: 'POST', data, ...(config || {}) });
   },
-  put(url, data) {
-    return request({ url, method: 'PUT', data });
+  put(url, data, config) {
+    return request({ url, method: 'PUT', data, ...(config || {}) });
   },
-  delete(url, data) {
-    return request({ url, method: 'DELETE', data });
+  delete(url, data, config) {
+    return request({ url, method: 'DELETE', data, ...(config || {}) });
   }
 }

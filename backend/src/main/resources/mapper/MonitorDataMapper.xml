@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wisdom.farm.mapper.MonitorDataMapper">
+    <resultMap id="MonitorDataResultMap" type="com.wisdom.farm.entity.MonitorData">
+        <id property="id" column="id"/>
+        <result property="landId" column="land_id"/>
+        <result property="temperature" column="temperature"/>
+        <result property="humidity" column="humidity"/>
+        <result property="soilMoisture" column="soil_moisture"/>
+        <result property="lightIntensity" column="light_intensity"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO monitor_data (land_id, temperature, humidity, soil_moisture, light_intensity)
+        VALUES (#{landId}, #{temperature}, #{humidity}, #{soilMoisture}, #{lightIntensity})
+    </insert>
+
+    <select id="latest" resultMap="MonitorDataResultMap">
+        SELECT id, land_id, temperature, humidity, soil_moisture, light_intensity, create_time
+        FROM monitor_data
+        WHERE land_id = #{landId}
+        ORDER BY id DESC
+        LIMIT 1
+    </select>
+
+    <select id="history" resultMap="MonitorDataResultMap">
+        SELECT id, land_id, temperature, humidity, soil_moisture, light_intensity, create_time
+        FROM monitor_data
+        WHERE land_id = #{landId}
+          AND create_time &gt;= #{since}
+        ORDER BY create_time ASC
+    </select>
+</mapper>

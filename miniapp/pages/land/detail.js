@@ -1,5 +1,4 @@
-import { getLandDetail } from '../../api/land.js'
-import { createOrder } from '../../api/order.js'
+const { getLandDetail, claimLand } = require('../../api/land.js')
 
 Page({
   data: {
@@ -16,7 +15,7 @@ Page({
   },
   
   async createOrder() {
-    await createOrder({ landId: this.data.land.id });
-    wx.showToast({ title: '创建订单成功' });
+    await claimLand(this.data.land.landId, { duration: 12 });
+    wx.showToast({ title: '认领订单成功' });
   }
 })

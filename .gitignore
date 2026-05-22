@@ -1,4 +1,4 @@
-# Maven
+# === Maven ===
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -10,31 +10,37 @@ buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
 
-# IDE
+# === IDE ===
 .idea/
 *.iml
 .vscode/
 *.swp
 *.swo
 
-# Node
+# === Node ===
 node_modules/
 
-# Logs
+# === Logs ===
 *.log
 
-# OS
+# === OS ===
 .DS_Store
 Thumbs.db
 
-# MCP Configuration (sensitive)
-mcp.json
-
-# Environment Variables
+# === 敏感配置 (禁止提交) ===
 .env
 .env.local
 .env.*.local
+mcp.json
 
-# Keep skill config (uses env vars)
-!.trae/skills/**/mcp.json
+# === 个人AI工具配置 (团队不需要) ===
+.codex/
+.trae/
 
+# === 个人文档 (团队不需要) ===
+SKILL.md
+TODO1.md
+mcp.example.json
+
+# === 临时分析报告 (可选保留在本地) ===
+# docs/*报告*.md
