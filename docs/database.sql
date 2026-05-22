@@ -149,3 +149,27 @@ CREATE TABLE IF NOT EXISTS `notification` (
   INDEX `idx_notification_user` (`user_id`),
   INDEX `idx_notification_type` (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='通知表';
+
+-- =============================================
+-- 补充土地表字段（zone/soilType/cropType/waterPrice/fertilizePrice）
+-- =============================================
+ALTER TABLE `land`
+  ADD COLUMN `zone` VARCHAR(32) DEFAULT NULL COMMENT '种植区域' AFTER `status`,
+  ADD COLUMN `soil_type` VARCHAR(32) DEFAULT NULL COMMENT '土壤类型' AFTER `zone`,
+  ADD COLUMN `crop_type` VARCHAR(32) DEFAULT NULL COMMENT '作物类型' AFTER `soil_type`,
+  ADD COLUMN `water_price` DECIMAL(10,2) DEFAULT 0.00 COMMENT '浇水服务单价（元/次）' AFTER `crop_type`,
+  ADD COLUMN `fertilize_price` DECIMAL(10,2) DEFAULT 0.00 COMMENT '施肥服务单价（元/次）' AFTER `water_price`;
+
+-- =============================================
+-- 测试土地数据
+-- =============================================
+INSERT INTO `land` (`name`, `location`, `area`, `price`, `description`, `images`, `status`, `zone`, `soil_type`, `crop_type`, `water_price`, `fertilize_price`) VALUES
+('A区-01号田', '农场东侧A区', 50.00, 2000.00, '阳光充足，适合种植叶菜类蔬菜', 'land_a01.jpg', 1, 'A区', '壤土', '生菜', 10.00, 15.00),
+('B区-02号田', '农场南侧B区', 80.00, 3200.00, '靠近水源，灌溉便利，适合根茎类作物', 'land_b02.jpg', 1, 'B区', '沙壤土', '胡萝卜', 12.00, 18.00),
+('C区-03号田', '农场西侧C区', 100.00, 4500.00, '面积较大，通风良好，适合瓜果类种植', 'land_c03.jpg', 2, 'C区', '黏壤土', '西瓜', 15.00, 20.00);
+
+-- =============================================
+-- 测试设备数据
+-- =============================================
+INSERT INTO `device` (`land_id`, `name`, `type`, `sn`, `secret`, `status`) VALUES
+(1, '智能浇灌设备A-001', 'water', 'DEV-A-001', 'sk_farm_secret_dev_a001_x7k9m2p', 1);

@@ -25,4 +25,22 @@
         FROM admin_user
         WHERE id = #{id}
     </select>
+
+    <select id="selectAll" resultMap="AdminUserResultMap">
+        SELECT id, username, password, password_hash, role, status, create_time, update_time
+        FROM admin_user
+        ORDER BY create_time DESC
+    </select>
+
+    <update id="updatePassword">
+        UPDATE admin_user
+        SET password_hash = #{passwordHash}, update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE admin_user
+        SET status = #{status}, update_time = NOW()
+        WHERE id = #{id}
+    </update>
 </mapper>

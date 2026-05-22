@@ -3,8 +3,41 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.wisdom.farm.mapper.AlertEventMapper">
+    <resultMap id="AlertEventResultMap" type="com.wisdom.farm.entity.AlertEvent">
+        <id property="id" column="id"/>
+        <result property="landId" column="land_id"/>
+        <result property="metric" column="metric"/>
+        <result property="value" column="value"/>
+        <result property="message" column="message"/>
+        <result property="handled" column="handled"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO alert_event (land_id, metric, value, message, handled)
         VALUES (#{landId}, #{metric}, #{value}, #{message}, #{handled})
     </insert>
+
+    <select id="selectById" resultMap="AlertEventResultMap">
+        SELECT id, land_id, metric, value, message, handled, create_time
+        FROM alert_event
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectList" resultMap="AlertEventResultMap">
+        SELECT id, land_id, metric, value, message, handled, create_time
+        FROM alert_event
+        <where>
+            <if test="handled != null">
+                AND handled = #{handled}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <update id="updateHandled">
+        UPDATE alert_event
+        SET handled = #{handled}
+        WHERE id = #{id}
+    </update>
 </mapper>

@@ -1,2635 +1,753 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.3",
   "info": {
-    "title": "默认模块",
-    "description": "土地监测系统后端接口文档。\n用户可认领土地，通过线上支付发送施肥浇水请求，管理员端接收请求人工执行。\n",
-    "version": "1.0.0"
+    "title": "智慧农场土地认领系统 API",
+    "description": "后端与小程序联调使用的 API 合同。后续新增、删减接口应先更新本文件，再同步实现与小程序调用。",
+    "version": "2.0.0"
   },
-  "tags": [
+  "servers": [
     {
-      "name": "认证"
-    },
-    {
-      "name": "用户"
-    },
-    {
-      "name": "土地"
-    },
-    {
-      "name": "监测数据"
-    },
-    {
-      "name": "服务订单"
-    },
-    {
-      "name": "支付"
-    },
-    {
-      "name": "管理员"
-    },
-    {
-      "name": "通知"
+      "url": "http://127.0.0.1:8080",
+      "description": "本地开发环境"
     }
+  ],
+  "tags": [
+    { "name": "认证" },
+    { "name": "用户" },
+    { "name": "土地" },
+    { "name": "订单" },
+    { "name": "支付" },
+    { "name": "监测" },
+    { "name": "通知" },
+    { "name": "管理员" },
+    { "name": "设备" },
+    { "name": "告警" }
   ],
   "paths": {
     "/auth/wx-login": {
       "post": {
+        "tags": ["认证"],
         "summary": "微信小程序登录",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "认证"
-        ],
-        "parameters": [],
+        "description": "开发环境未配置真实微信 AppID/Secret 时，后端使用 dev_openid_ 前缀模拟 openid。",
+        "security": [],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "code"
-                ],
-                "properties": {
-                  "code": {
-                    "type": "string",
-                    "description": "wx.login()获取的临时登录凭证"
-                  }
-                }
-              }
+              "schema": { "$ref": "#/components/schemas/WxLoginRequest" }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "object",
-                          "properties": {
-                            "token": {
-                              "type": "string",
-                              "example": "eyJhbGciOiJIUzI1NiJ9..."
-                            },
-                            "tokenExpire": {
-                              "type": "string",
-                              "format": "date-time"
-                            },
-                            "isNewUser": {
-                              "type": "boolean"
-                            },
-                            "userInfo": {
-                              "$ref": "#/components/schemas/UserInfo"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+          "200": { "$ref": "#/components/responses/LoginResultResponse" }
+        }
       }
     },
     "/auth/bind-phone": {
       "post": {
+        "tags": ["认证"],
         "summary": "绑定手机号",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "认证"
-        ],
-        "parameters": [],
+        "security": [{ "BearerAuth": [] }],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "code"
-                ],
-                "properties": {
-                  "code": {
-                    "type": "string",
-                    "description": "getPhoneNumber获取的code"
-                  }
-                }
-              }
+              "schema": { "$ref": "#/components/schemas/BindPhoneRequest" }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "object",
-                          "properties": {
-                            "phone": {
-                              "type": "string",
-                              "example": "138****8888"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+          "200": { "$ref": "#/components/responses/PhoneBindResponse" }
+        }
       }
     },
     "/auth/admin-login": {
       "post": {
+        "tags": ["认证"],
         "summary": "管理员登录",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "认证"
-        ],
-        "parameters": [],
+        "description": "前端传普通密码；后端负责 PBKDF2 哈希校验。不要在文档或前端约定 MD5 传输。",
+        "security": [],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "username",
-                  "password"
-                ],
-                "properties": {
-                  "username": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string",
-                    "description": "MD5传输"
-                  }
-                }
-              }
+              "schema": { "$ref": "#/components/schemas/AdminLoginRequest" }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "object",
-                          "properties": {
-                            "token": {
-                              "type": "string"
-                            },
-                            "tokenExpire": {
-                              "type": "string",
-                              "format": "date-time"
-                            },
-                            "adminInfo": {
-                              "$ref": "#/components/schemas/AdminInfo"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+          "200": { "$ref": "#/components/responses/AdminLoginResponse" }
+        }
       }
     },
     "/user/profile": {
       "get": {
-        "summary": "获取用户信息",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "用户"
-        ],
-        "parameters": [],
+        "tags": ["用户"],
+        "summary": "获取当前用户信息",
+        "security": [{ "BearerAuth": [] }],
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/UserDetail"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+          "200": { "$ref": "#/components/responses/UserInfoResponse" }
+        }
       },
       "put": {
-        "summary": "更新用户信息",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "用户"
-        ],
-        "parameters": [],
+        "tags": ["用户"],
+        "summary": "更新当前用户信息",
+        "security": [{ "BearerAuth": [] }],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "nickname": {
-                    "type": "string",
-                    "maxLength": 20
-                  },
-                  "avatar": {
-                    "type": "string"
-                  }
-                }
-              }
+              "schema": { "$ref": "#/components/schemas/UserUpdateRequest" }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResult"
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+          "200": { "$ref": "#/components/responses/UserInfoResponse" }
+        }
       }
     },
     "/user/lands": {
       "get": {
+        "tags": ["用户"],
         "summary": "获取我的认领土地列表",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "用户"
-        ],
+        "security": [{ "BearerAuth": [] }],
         "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "页码",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "每页条数",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 10,
-              "maximum": 50
-            }
-          }
+          { "$ref": "#/components/parameters/Page" },
+          { "$ref": "#/components/parameters/Size" }
         ],
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/PageResultClaimLand"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+          "200": { "$ref": "#/components/responses/PageClaimLandResponse" }
+        }
       }
     },
     "/user/orders": {
       "get": {
+        "tags": ["用户"],
         "summary": "获取我的订单列表",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "用户"
-        ],
+        "security": [{ "BearerAuth": [] }],
         "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "页码",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "每页条数",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 10,
-              "maximum": 50
-            }
-          },
-          {
-            "name": "status",
-            "in": "query",
-            "description": "订单状态筛选",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "PENDING_PAY",
-                "PAID",
-                "PROCESSING",
-                "COMPLETED",
-                "CANCELLED"
-              ]
-            }
-          }
+          { "$ref": "#/components/parameters/Page" },
+          { "$ref": "#/components/parameters/Size" },
+          { "$ref": "#/components/parameters/OrderStatusQuery" }
         ],
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/PageResultOrder"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+          "200": { "$ref": "#/components/responses/PageOrderResponse" }
+        }
       }
     },
     "/lands": {
       "get": {
+        "tags": ["土地"],
         "summary": "获取土地列表",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "土地"
-        ],
+        "description": "公开可访问，未登录也可查看土地列表。",
+        "security": [],
         "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "页码",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "每页条数",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 10,
-              "maximum": 50
-            }
-          },
+          { "$ref": "#/components/parameters/Page" },
+          { "$ref": "#/components/parameters/Size" },
           {
             "name": "zone",
             "in": "query",
-            "description": "区域筛选 A/B/C",
             "required": false,
-            "schema": {
-              "type": "string"
-            }
+            "schema": { "type": "string" },
+            "description": "区域筛选，如 A/B/C"
           },
           {
             "name": "status",
             "in": "query",
-            "description": "土地状态筛选",
             "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "AVAILABLE",
-                "CLAIMED",
-                "ALL"
-              ],
-              "default": "ALL"
-            }
+            "schema": { "$ref": "#/components/schemas/LandStatusFilter" },
+            "description": "土地状态筛选"
           }
         ],
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/PageResultLand"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+          "200": { "$ref": "#/components/responses/PageLandResponse" }
+        }
       }
     },
     "/lands/{landId}": {
       "get": {
+        "tags": ["土地"],
         "summary": "获取土地详情",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "土地"
-        ],
-        "parameters": [
-          {
-            "name": "landId",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "example": 0,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
+        "security": [],
+        "parameters": [{ "$ref": "#/components/parameters/LandId" }],
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/LandDetail"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+          "200": { "$ref": "#/components/responses/LandResponse" }
+        }
       }
     },
     "/lands/{landId}/claim": {
       "post": {
+        "tags": ["土地"],
         "summary": "认领土地",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "土地"
-        ],
-        "parameters": [
-          {
-            "name": "landId",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "example": 0,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/LandId" }],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "duration"
-                ],
-                "properties": {
-                  "duration": {
-                    "type": "integer",
-                    "enum": [
-                      1,
-                      3,
-                      6,
-                      12
-                    ],
-                    "description": "认领时长（月）"
-                  }
-                }
-              }
+              "schema": { "$ref": "#/components/schemas/ClaimLandRequest" }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/ClaimResult"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+          "200": { "$ref": "#/components/responses/ClaimResultResponse" }
+        }
       }
     },
     "/lands/{landId}/monitor": {
       "get": {
+        "tags": ["监测"],
         "summary": "获取土地监测数据",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "监测数据"
-        ],
+        "security": [{ "BearerAuth": [] }],
         "parameters": [
-          {
-            "name": "landId",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "example": 0,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "range",
-            "in": "query",
-            "description": "历史范围",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "24h",
-                "7d",
-                "30d"
-              ],
-              "default": "24h"
-            }
-          }
+          { "$ref": "#/components/parameters/LandId" },
+          { "$ref": "#/components/parameters/MonitorRange" }
         ],
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/MonitorData"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+          "200": { "$ref": "#/components/responses/LandMonitorResponse" }
+        }
       }
     },
     "/monitor/report": {
       "post": {
-        "summary": "上报监测数据",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "监测数据"
+        "tags": ["监测"],
+        "summary": "设备上报监测数据",
+        "description": "设备接口不使用用户 JWT，必须通过 X-Device-SN 与 X-Device-Token 鉴权。",
+        "security": [{ "DeviceAuth": [] }],
+        "parameters": [
+          { "$ref": "#/components/parameters/DeviceSn" },
+          { "$ref": "#/components/parameters/DeviceToken" }
         ],
-        "parameters": [],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "landId"
-                ],
-                "properties": {
-                  "landId": {
-                    "type": "integer"
-                  },
-                  "temperature": {
-                    "type": "number",
-                    "format": "double",
-                    "description": "温度℃"
-                  },
-                  "humidity": {
-                    "type": "number",
-                    "format": "double",
-                    "description": "空气湿度%"
-                  },
-                  "soilMoisture": {
-                    "type": "number",
-                    "format": "double",
-                    "description": "土壤湿度%"
-                  },
-                  "lightIntensity": {
-                    "type": "number",
-                    "format": "double",
-                    "description": "光照强度lux"
-                  }
-                }
-              }
+              "schema": { "$ref": "#/components/schemas/MonitorReportRequest" }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResult"
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+          "200": { "$ref": "#/components/responses/MonitorReportResponse" }
+        }
       }
     },
     "/orders": {
       "post": {
+        "tags": ["订单"],
         "summary": "创建服务订单",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "服务订单"
-        ],
-        "parameters": [],
+        "security": [{ "BearerAuth": [] }],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "landId",
-                  "serviceType"
-                ],
-                "properties": {
-                  "landId": {
-                    "type": "integer"
-                  },
-                  "serviceType": {
-                    "type": "string",
-                    "enum": [
-                      "WATER",
-                      "FERTILIZE"
-                    ],
-                    "description": "WATER浇水 FERTILIZE施肥"
-                  },
-                  "quantity": {
-                    "type": "integer",
-                    "default": 1
-                  },
-                  "remark": {
-                    "type": "string",
-                    "maxLength": 200
-                  }
-                }
-              }
+              "schema": { "$ref": "#/components/schemas/ServiceOrderRequest" }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/OrderDetail"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+          "200": { "$ref": "#/components/responses/OrderResponse" }
+        }
       }
     },
     "/orders/{orderId}": {
       "get": {
+        "tags": ["订单"],
         "summary": "获取订单详情",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "服务订单"
-        ],
-        "parameters": [
-          {
-            "name": "orderId",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "example": 0,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/OrderId" }],
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/OrderDetail"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+          "200": { "$ref": "#/components/responses/OrderResponse" }
+        }
       }
     },
     "/orders/{orderId}/cancel": {
       "put": {
+        "tags": ["订单"],
         "summary": "取消订单",
-        "deprecated": false,
-        "description": "仅限PENDING_PAY状态",
-        "tags": [
-          "服务订单"
-        ],
-        "parameters": [
-          {
-            "name": "orderId",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "example": 0,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/OrderId" }],
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResult"
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+          "200": { "$ref": "#/components/responses/EmptyResponse" }
+        }
       }
     },
     "/pay/create": {
       "post": {
-        "summary": "发起微信支付",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "支付"
-        ],
-        "parameters": [],
+        "tags": ["支付"],
+        "summary": "创建微信支付",
+        "security": [{ "BearerAuth": [] }],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "type",
-                  "bizId"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "CLAIM",
-                      "SERVICE"
-                    ],
-                    "description": "CLAIM认领支付 SERVICE服务支付"
-                  },
-                  "bizId": {
-                    "type": "integer",
-                    "description": "认领ID或订单ID"
-                  }
-                }
-              }
+              "schema": { "$ref": "#/components/schemas/PaymentCreateRequest" }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/PaymentResult"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+          "200": { "$ref": "#/components/responses/PaymentCreateResponse" }
+        }
       }
     },
     "/pay/status/{paymentId}": {
       "get": {
-        "summary": "支付结果查询",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "支付"
-        ],
-        "parameters": [
-          {
-            "name": "paymentId",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "example": 0,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
+        "tags": ["支付"],
+        "summary": "查询支付状态",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PaymentId" }],
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/PaymentStatus"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+          "200": { "$ref": "#/components/responses/PaymentStatusResponse" }
+        }
       }
     },
     "/pay/notify/wechat": {
       "post": {
+        "tags": ["支付"],
         "summary": "微信支付回调",
-        "deprecated": false,
-        "description": "微信服务器回调，无需token验证",
-        "tags": [
-          "支付"
-        ],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "成功",
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/admin/orders/pending": {
-      "get": {
-        "summary": "获取待处理订单列表",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "管理员"
-        ],
+        "description": "微信支付平台调用。生产环境会校验 Wechatpay-* 签名头并解密 API v3 resource。开发环境未配置商户参数时允许本地简化回调。",
+        "security": [],
         "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "页码",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "每页条数",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 10,
-              "maximum": 50
-            }
-          },
-          {
-            "name": "serviceType",
-            "in": "query",
-            "description": "",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "WATER",
-                "FERTILIZE",
-                "ALL"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/PageResultOrder"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/admin/orders": {
-      "get": {
-        "summary": "获取所有订单列表",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "管理员"
-        ],
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "页码",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "每页条数",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 10,
-              "maximum": 50
-            }
-          },
-          {
-            "name": "status",
-            "in": "query",
-            "description": "",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "PENDING_PAY",
-                "PAID",
-                "PROCESSING",
-                "COMPLETED",
-                "CANCELLED",
-                "ALL"
-              ]
-            }
-          },
-          {
-            "name": "serviceType",
-            "in": "query",
-            "description": "",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "WATER",
-                "FERTILIZE"
-              ]
-            }
-          },
-          {
-            "name": "startDate",
-            "in": "query",
-            "description": "",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            }
-          },
-          {
-            "name": "endDate",
-            "in": "query",
-            "description": "",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/PageResultOrder"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/admin/orders/{orderId}/accept": {
-      "put": {
-        "summary": "管理员接单",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "管理员"
-        ],
-        "parameters": [
-          {
-            "name": "orderId",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "example": 0,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "object",
-                          "properties": {
-                            "orderId": {
-                              "type": "integer"
-                            },
-                            "status": {
-                              "type": "string",
-                              "example": "PROCESSING"
-                            },
-                            "statusName": {
-                              "type": "string",
-                              "example": "处理中"
-                            },
-                            "acceptTime": {
-                              "type": "string",
-                              "format": "date-time"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/admin/orders/{orderId}/complete": {
-      "put": {
-        "summary": "完成服务",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "管理员"
-        ],
-        "parameters": [
-          {
-            "name": "orderId",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "example": 0,
-            "schema": {
-              "type": "integer"
-            }
-          }
+          { "$ref": "#/components/parameters/WechatpayTimestamp" },
+          { "$ref": "#/components/parameters/WechatpayNonce" },
+          { "$ref": "#/components/parameters/WechatpaySignature" }
         ],
         "requestBody": {
+          "required": false,
           "content": {
             "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "completeImages"
-                ],
-                "properties": {
-                  "completeImages": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "minItems": 1,
-                    "maxItems": 5,
-                    "description": "完工照片URL"
-                  },
-                  "completeRemark": {
-                    "type": "string",
-                    "maxLength": 200,
-                    "description": "完工备注"
-                  }
-                }
-              }
+              "schema": { "$ref": "#/components/schemas/WechatPayNotifyRequest" }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "object",
-                          "properties": {
-                            "orderId": {
-                              "type": "integer"
-                            },
-                            "status": {
-                              "type": "string",
-                              "example": "COMPLETED"
-                            },
-                            "statusName": {
-                              "type": "string",
-                              "example": "已完成"
-                            },
-                            "completeTime": {
-                              "type": "string",
-                              "format": "date-time"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
+            "description": "成功。当前后端返回空响应体。"
           }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/admin/lands": {
-      "post": {
-        "summary": "新增土地",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "管理员"
-        ],
-        "parameters": [],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LandCreateRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "object",
-                          "properties": {
-                            "landId": {
-                              "type": "integer"
-                            },
-                            "landName": {
-                              "type": "string"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/admin/lands/{landId}": {
-      "put": {
-        "summary": "修改土地信息",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "管理员"
-        ],
-        "parameters": [
-          {
-            "name": "landId",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "example": 0,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LandCreateRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResult"
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/admin/lands/{landId}/release": {
-      "put": {
-        "summary": "释放土地",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "管理员"
-        ],
-        "parameters": [
-          {
-            "name": "landId",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "example": 0,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "reason"
-                ],
-                "properties": {
-                  "reason": {
-                    "type": "string",
-                    "description": "释放原因"
-                  }
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResult"
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/admin/stats": {
-      "get": {
-        "summary": "数据统计",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "管理员"
-        ],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/AdminStats"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+        }
       }
     },
     "/notifications": {
       "get": {
+        "tags": ["通知"],
         "summary": "获取通知列表",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "通知"
-        ],
+        "security": [{ "BearerAuth": [] }],
         "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "页码",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "每页条数",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 10,
-              "maximum": 50
-            }
-          },
+          { "$ref": "#/components/parameters/Page" },
+          { "$ref": "#/components/parameters/Size" },
           {
             "name": "type",
             "in": "query",
-            "description": "",
             "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "SYSTEM",
-                "SERVICE",
-                "PAY"
-              ]
-            }
+            "schema": { "$ref": "#/components/schemas/NotificationType" }
           }
         ],
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResult"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/PageResultNotification"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+          "200": { "$ref": "#/components/responses/PageNotificationResponse" }
+        }
       }
     },
     "/notifications/{notificationId}/read": {
       "put": {
+        "tags": ["通知"],
         "summary": "标记通知已读",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "通知"
-        ],
-        "parameters": [
-          {
-            "name": "notificationId",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "example": 0,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/NotificationId" }],
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResult"
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
+          "200": { "$ref": "#/components/responses/EmptyResponse" }
+        }
       }
     },
     "/notifications/read-all": {
       "put": {
-        "summary": "全部标记已读",
-        "deprecated": false,
-        "description": "",
-        "tags": [
-          "通知"
-        ],
-        "parameters": [],
+        "tags": ["通知"],
+        "summary": "全部通知标记已读",
+        "security": [{ "BearerAuth": [] }],
         "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResult"
-                }
-              }
-            },
-            "headers": {}
+          "200": { "$ref": "#/components/responses/EmptyResponse" }
+        }
+      }
+    },
+    "/admin/orders/pending": {
+      "get": {
+        "tags": ["管理员"],
+        "summary": "获取待处理订单列表",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "$ref": "#/components/parameters/Page" },
+          { "$ref": "#/components/parameters/Size" },
+          { "$ref": "#/components/parameters/ServiceTypeQuery" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/PageOrderResponse" }
+        }
+      }
+    },
+    "/admin/orders": {
+      "get": {
+        "tags": ["管理员"],
+        "summary": "获取所有订单列表",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "$ref": "#/components/parameters/Page" },
+          { "$ref": "#/components/parameters/Size" },
+          { "$ref": "#/components/parameters/OrderStatusQuery" },
+          { "$ref": "#/components/parameters/ServiceTypeQuery" },
+          { "name": "startDate", "in": "query", "required": false, "schema": { "type": "string", "format": "date" } },
+          { "name": "endDate", "in": "query", "required": false, "schema": { "type": "string", "format": "date" } }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/PageOrderResponse" }
+        }
+      }
+    },
+    "/admin/orders/{orderId}/accept": {
+      "put": {
+        "tags": ["管理员"],
+        "summary": "管理员接单",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/OrderId" }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/OrderStatusResponse" }
+        }
+      }
+    },
+    "/admin/orders/{orderId}/complete": {
+      "put": {
+        "tags": ["管理员"],
+        "summary": "完成服务订单",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/OrderId" }],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CompleteOrderRequest" }
+            }
           }
         },
-        "security": [
-          {
-            "BearerAuth": []
+        "responses": {
+          "200": { "$ref": "#/components/responses/OrderCompleteResponse" }
+        }
+      }
+    },
+    "/admin/lands": {
+      "post": {
+        "tags": ["管理员"],
+        "summary": "新增土地",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LandUpsertRequest" }
+            }
           }
-        ]
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/LandResponse" }
+        }
+      }
+    },
+    "/admin/lands/{landId}": {
+      "put": {
+        "tags": ["管理员"],
+        "summary": "修改土地",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/LandId" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LandUpsertRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/LandResponse" }
+        }
+      }
+    },
+    "/admin/lands/{landId}/release": {
+      "put": {
+        "tags": ["管理员"],
+        "summary": "释放土地",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/LandId" }],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ReleaseLandRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/ReleaseLandResponse" }
+        }
+      }
+    },
+    "/admin/stats": {
+      "get": {
+        "tags": ["管理员"],
+        "summary": "管理员统计",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/AdminStatsResponse" }
+        }
+      }
+    },
+    "/admin/password/change": {
+      "put": {
+        "tags": ["管理员"],
+        "summary": "管理员修改自己的密码",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ChangePasswordRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/EmptyResponse" }
+        }
+      }
+    },
+    "/admin/users": {
+      "get": {
+        "tags": ["管理员"],
+        "summary": "管理员账号列表",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/AdminUserListResponse" }
+        }
+      }
+    },
+    "/admin/users/{adminId}/reset-password": {
+      "put": {
+        "tags": ["管理员"],
+        "summary": "超级管理员重置管理员密码",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/AdminId" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ResetPasswordRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/EmptyResponse" }
+        }
+      }
+    },
+    "/admin/users/{adminId}/status": {
+      "put": {
+        "tags": ["管理员"],
+        "summary": "启用或禁用管理员账号",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/AdminId" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateStatusRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/EmptyResponse" }
+        }
+      }
+    },
+    "/admin/alerts": {
+      "get": {
+        "tags": ["告警"],
+        "summary": "告警事件列表",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "handled",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "enum": [0, 1] },
+            "description": "0 未处理，1 已处理"
+          }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/AlertListResponse" }
+        }
+      }
+    },
+    "/admin/alerts/{alertId}/handle": {
+      "put": {
+        "tags": ["告警"],
+        "summary": "处理告警事件",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/AlertId" }],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/HandleAlertRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/EmptyResponse" }
+        }
+      }
+    },
+    "/admin/devices": {
+      "get": {
+        "tags": ["设备"],
+        "summary": "设备列表",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/DeviceListResponse" }
+        }
+      }
+    },
+    "/admin/devices/{deviceId}/reset-secret": {
+      "put": {
+        "tags": ["设备"],
+        "summary": "重置设备上报密钥",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/DeviceId" }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/DeviceSecretResponse" }
+        }
       }
     }
   },
   "components": {
-    "schemas": {
-      "ApiResult": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "integer",
-            "description": "0成功，其他为错误码",
-            "example": 0
-          },
-          "msg": {
-            "type": "string",
-            "example": "success"
-          },
-          "data": {
-            "type": "object",
-            "properties": {}
-          }
-        }
-      },
-      "UserInfo": {
-        "type": "object",
-        "properties": {
-          "userId": {
-            "type": "integer",
-            "example": 10001
-          },
-          "nickname": {
-            "type": "string",
-            "example": "微信用户"
-          },
-          "avatar": {
-            "type": "string"
-          },
-          "phone": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "UserDetail": {
-        "type": "object",
-        "properties": {
-          "userId": {
-            "type": "integer"
-          },
-          "nickname": {
-            "type": "string"
-          },
-          "avatar": {
-            "type": "string"
-          },
-          "phone": {
-            "type": "string"
-          },
-          "claimCount": {
-            "type": "integer",
-            "description": "认领土地数"
-          },
-          "orderCount": {
-            "type": "integer",
-            "description": "订单数"
-          },
-          "createTime": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "AdminInfo": {
-        "type": "object",
-        "properties": {
-          "adminId": {
-            "type": "integer"
-          },
-          "username": {
-            "type": "string"
-          },
-          "role": {
-            "type": "string",
-            "enum": [
-              "SUPER_ADMIN",
-              "ADMIN"
-            ]
-          }
-        }
-      },
-      "LandItem": {
-        "type": "object",
-        "properties": {
-          "landId": {
-            "type": "integer"
-          },
-          "landName": {
-            "type": "string",
-            "example": "A区-01号田"
-          },
-          "zone": {
-            "type": "string",
-            "example": "A"
-          },
-          "area": {
-            "type": "number",
-            "format": "double",
-            "example": 10.5
-          },
-          "areaUnit": {
-            "type": "string",
-            "example": "㎡"
-          },
-          "image": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "AVAILABLE",
-              "CLAIMED"
-            ]
-          },
-          "statusName": {
-            "type": "string"
-          },
-          "price": {
-            "type": "number",
-            "format": "double",
-            "example": 299
-          },
-          "priceUnit": {
-            "type": "string",
-            "example": "元/年"
-          },
-          "soilType": {
-            "type": "string",
-            "example": "黑土"
-          },
-          "cropType": {
-            "type": "string",
-            "example": "水稻"
-          },
-          "claimUser": {
-            "type": "string",
-            "nullable": true
-          },
-          "claimExpireTime": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          }
-        }
-      },
-      "LandDetail": {
-        "type": "object",
-        "properties": {
-          "landId": {
-            "type": "integer"
-          },
-          "landName": {
-            "type": "string"
-          },
-          "zone": {
-            "type": "string"
-          },
-          "area": {
-            "type": "number",
-            "format": "double"
-          },
-          "areaUnit": {
-            "type": "string"
-          },
-          "images": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "status": {
-            "type": "string"
-          },
-          "statusName": {
-            "type": "string"
-          },
-          "price": {
-            "type": "number",
-            "format": "double"
-          },
-          "priceUnit": {
-            "type": "string"
-          },
-          "soilType": {
-            "type": "string"
-          },
-          "cropType": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "claimUser": {
-            "type": "object",
-            "properties": {
-              "userId": {
-                "type": "integer"
-              },
-              "nickname": {
-                "type": "string"
-              },
-              "avatar": {
-                "type": "string"
-              }
-            },
-            "nullable": true
-          },
-          "claimTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "claimExpireTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "latestMonitor": {
-            "$ref": "#/components/schemas/MonitorLatest"
-          },
-          "servicePrice": {
-            "type": "object",
-            "properties": {
-              "waterPrice": {
-                "type": "number",
-                "format": "double",
-                "example": 15
-              },
-              "fertilizePrice": {
-                "type": "number",
-                "format": "double",
-                "example": 35
-              },
-              "priceUnit": {
-                "type": "string",
-                "example": "元/次"
-              }
-            }
-          }
-        }
-      },
-      "LandCreateRequest": {
-        "type": "object",
-        "required": [
-          "landName",
-          "zone",
-          "area",
-          "price",
-          "waterPrice",
-          "fertilizePrice"
-        ],
-        "properties": {
-          "landName": {
-            "type": "string"
-          },
-          "zone": {
-            "type": "string"
-          },
-          "area": {
-            "type": "number",
-            "format": "double"
-          },
-          "areaUnit": {
-            "type": "string",
-            "default": "㎡"
-          },
-          "soilType": {
-            "type": "string"
-          },
-          "cropType": {
-            "type": "string"
-          },
-          "price": {
-            "type": "number",
-            "format": "double",
-            "description": "认领价格"
-          },
-          "waterPrice": {
-            "type": "number",
-            "format": "double",
-            "description": "浇水价格"
-          },
-          "fertilizePrice": {
-            "type": "number",
-            "format": "double",
-            "description": "施肥价格"
-          },
-          "description": {
-            "type": "string"
-          },
-          "images": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "ClaimResult": {
-        "type": "object",
-        "properties": {
-          "claimId": {
-            "type": "integer"
-          },
-          "landId": {
-            "type": "integer"
-          },
-          "landName": {
-            "type": "string"
-          },
-          "duration": {
-            "type": "integer",
-            "description": "认领时长（月）"
-          },
-          "amount": {
-            "type": "number",
-            "format": "double"
-          },
-          "paymentNo": {
-            "type": "string",
-            "description": "支付单号"
-          },
-          "status": {
-            "type": "string",
-            "example": "PENDING_PAY"
-          },
-          "expireTime": {
-            "type": "string",
-            "format": "date-time",
-            "description": "支付过期时间"
-          }
-        }
-      },
-      "ClaimLandItem": {
-        "type": "object",
-        "properties": {
-          "claimId": {
-            "type": "integer"
-          },
-          "landId": {
-            "type": "integer"
-          },
-          "landName": {
-            "type": "string"
-          },
-          "landImage": {
-            "type": "string"
-          },
-          "area": {
-            "type": "number",
-            "format": "double"
-          },
-          "areaUnit": {
-            "type": "string"
-          },
-          "claimTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "expireTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "status": {
-            "type": "string",
-            "example": "ACTIVE"
-          }
-        }
-      },
-      "OrderDetail": {
-        "type": "object",
-        "properties": {
-          "orderId": {
-            "type": "integer"
-          },
-          "landId": {
-            "type": "integer"
-          },
-          "landName": {
-            "type": "string"
-          },
-          "serviceType": {
-            "type": "string",
-            "enum": [
-              "WATER",
-              "FERTILIZE"
-            ]
-          },
-          "serviceTypeName": {
-            "type": "string",
-            "example": "浇水"
-          },
-          "quantity": {
-            "type": "integer"
-          },
-          "amount": {
-            "type": "number",
-            "format": "double"
-          },
-          "remark": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "PENDING_PAY",
-              "PAID",
-              "PROCESSING",
-              "COMPLETED",
-              "CANCELLED"
-            ]
-          },
-          "statusName": {
-            "type": "string"
-          },
-          "createTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "payTime": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "acceptTime": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "completeTime": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "operator": {
-            "type": "object",
-            "properties": {
-              "adminId": {
-                "type": "integer"
-              },
-              "adminName": {
-                "type": "string"
-              }
-            },
-            "nullable": true
-          },
-          "completeImages": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "nullable": true
-          },
-          "completeRemark": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "PaymentResult": {
-        "type": "object",
-        "properties": {
-          "paymentId": {
-            "type": "integer"
-          },
-          "paymentNo": {
-            "type": "string"
-          },
-          "amount": {
-            "type": "number",
-            "format": "double"
-          },
-          "wxPayParams": {
-            "type": "object",
-            "description": "微信支付参数，直接传给wx.requestPayment",
-            "properties": {
-              "timeStamp": {
-                "type": "string"
-              },
-              "nonceStr": {
-                "type": "string"
-              },
-              "package": {
-                "type": "string"
-              },
-              "signType": {
-                "type": "string",
-                "example": "RSA"
-              },
-              "paySign": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      },
-      "PaymentStatus": {
-        "type": "object",
-        "properties": {
-          "paymentId": {
-            "type": "integer"
-          },
-          "paymentNo": {
-            "type": "string"
-          },
-          "amount": {
-            "type": "number",
-            "format": "double"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "PENDING",
-              "PAID",
-              "REFUNDED",
-              "FAILED"
-            ]
-          },
-          "statusName": {
-            "type": "string"
-          },
-          "payTime": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "payMethod": {
-            "type": "string",
-            "example": "WECHAT"
-          }
-        }
-      },
-      "MonitorLatest": {
-        "type": "object",
-        "properties": {
-          "temperature": {
-            "type": "number",
-            "format": "double",
-            "description": "温度℃"
-          },
-          "humidity": {
-            "type": "number",
-            "format": "double",
-            "description": "空气湿度%"
-          },
-          "soilMoisture": {
-            "type": "number",
-            "format": "double",
-            "description": "土壤湿度%"
-          },
-          "lightIntensity": {
-            "type": "number",
-            "format": "double",
-            "description": "光照强度lux"
-          },
-          "updateTime": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "MonitorData": {
-        "type": "object",
-        "properties": {
-          "landId": {
-            "type": "integer"
-          },
-          "landName": {
-            "type": "string"
-          },
-          "latest": {
-            "$ref": "#/components/schemas/MonitorLatest"
-          },
-          "history": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "time": {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                "temperature": {
-                  "type": "number",
-                  "format": "double"
-                },
-                "humidity": {
-                  "type": "number",
-                  "format": "double"
-                },
-                "soilMoisture": {
-                  "type": "number",
-                  "format": "double"
-                },
-                "lightIntensity": {
-                  "type": "number",
-                  "format": "double"
-                }
-              }
-            }
-          }
-        }
-      },
-      "NotificationItem": {
-        "type": "object",
-        "properties": {
-          "notificationId": {
-            "type": "integer"
-          },
-          "title": {
-            "type": "string"
-          },
-          "content": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "SYSTEM",
-              "SERVICE",
-              "PAY"
-            ]
-          },
-          "isRead": {
-            "type": "boolean"
-          },
-          "createTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "extra": {
-            "type": "object",
-            "properties": {},
-            "nullable": true
-          }
-        }
-      },
-      "AdminStats": {
-        "type": "object",
-        "properties": {
-          "totalLands": {
-            "type": "integer"
-          },
-          "claimedLands": {
-            "type": "integer"
-          },
-          "totalUsers": {
-            "type": "integer"
-          },
-          "totalOrders": {
-            "type": "integer"
-          },
-          "pendingOrders": {
-            "type": "integer"
-          },
-          "todayRevenue": {
-            "type": "number",
-            "format": "double"
-          },
-          "monthRevenue": {
-            "type": "number",
-            "format": "double"
-          },
-          "serviceTypeStats": {
-            "type": "object",
-            "properties": {
-              "waterCount": {
-                "type": "integer"
-              },
-              "fertilizeCount": {
-                "type": "integer"
-              }
-            }
-          }
-        }
-      },
-      "PageResultLand": {
-        "type": "object",
-        "properties": {
-          "list": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LandItem"
-            }
-          },
-          "total": {
-            "type": "integer"
-          },
-          "page": {
-            "type": "integer"
-          },
-          "size": {
-            "type": "integer"
-          }
-        }
-      },
-      "PageResultClaimLand": {
-        "type": "object",
-        "properties": {
-          "list": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ClaimLandItem"
-            }
-          },
-          "total": {
-            "type": "integer"
-          },
-          "page": {
-            "type": "integer"
-          },
-          "size": {
-            "type": "integer"
-          }
-        }
-      },
-      "PageResultOrder": {
-        "type": "object",
-        "properties": {
-          "list": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/OrderDetail"
-            }
-          },
-          "total": {
-            "type": "integer"
-          },
-          "page": {
-            "type": "integer"
-          },
-          "size": {
-            "type": "integer"
-          }
-        }
-      },
-      "PageResultNotification": {
-        "type": "object",
-        "properties": {
-          "list": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/NotificationItem"
-            }
-          },
-          "total": {
-            "type": "integer"
-          },
-          "page": {
-            "type": "integer"
-          },
-          "size": {
-            "type": "integer"
-          },
-          "unreadCount": {
-            "type": "integer"
-          }
-        }
-      }
-    },
-    "responses": {},
     "securitySchemes": {
       "BearerAuth": {
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
+      },
+      "DeviceAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Device-Token",
+        "description": "设备密钥。设备编号通过 X-Device-SN 传入。"
       }
+    },
+    "parameters": {
+      "Page": { "name": "page", "in": "query", "required": false, "schema": { "type": "integer", "default": 1, "minimum": 1 } },
+      "Size": { "name": "size", "in": "query", "required": false, "schema": { "type": "integer", "default": 10, "minimum": 1, "maximum": 100 } },
+      "LandId": { "name": "landId", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } },
+      "OrderId": { "name": "orderId", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } },
+      "PaymentId": { "name": "paymentId", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } },
+      "NotificationId": { "name": "notificationId", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } },
+      "AdminId": { "name": "adminId", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } },
+      "AlertId": { "name": "alertId", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } },
+      "DeviceId": { "name": "deviceId", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } },
+      "OrderStatusQuery": { "name": "status", "in": "query", "required": false, "schema": { "$ref": "#/components/schemas/OrderStatus" } },
+      "ServiceTypeQuery": { "name": "serviceType", "in": "query", "required": false, "schema": { "$ref": "#/components/schemas/ServiceType" } },
+      "MonitorRange": { "name": "range", "in": "query", "required": false, "schema": { "type": "string", "enum": ["24h", "7d", "30d"], "default": "24h" } },
+      "DeviceSn": { "name": "X-Device-SN", "in": "header", "required": true, "schema": { "type": "string" }, "description": "设备编号，如 DEV-A-001" },
+      "DeviceToken": { "name": "X-Device-Token", "in": "header", "required": true, "schema": { "type": "string" }, "description": "设备上报密钥" },
+      "WechatpayTimestamp": { "name": "Wechatpay-Timestamp", "in": "header", "required": false, "schema": { "type": "string" } },
+      "WechatpayNonce": { "name": "Wechatpay-Nonce", "in": "header", "required": false, "schema": { "type": "string" } },
+      "WechatpaySignature": { "name": "Wechatpay-Signature", "in": "header", "required": false, "schema": { "type": "string" } }
+    },
+    "responses": {
+      "EmptyResponse": { "description": "成功", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiResultEmpty" } } } },
+      "LoginResultResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/LoginResult" } } }] } } } },
+      "AdminLoginResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/AdminLoginResult" } } }] } } } },
+      "PhoneBindResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/PhoneBindResult" } } }] } } } },
+      "UserInfoResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/UserInfo" } } }] } } } },
+      "PageLandResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/PageResultLand" } } }] } } } },
+      "LandResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/Land" } } }] } } } },
+      "ClaimResultResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/ClaimResult" } } }] } } } },
+      "LandMonitorResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/LandMonitor" } } }] } } } },
+      "MonitorReportResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/MonitorReportResult" } } }] } } } },
+      "OrderResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/Order" } } }] } } } },
+      "PageOrderResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/PageResultOrder" } } }] } } } },
+      "OrderStatusResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/OrderStatusResult" } } }] } } } },
+      "OrderCompleteResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/OrderCompleteResult" } } }] } } } },
+      "PaymentCreateResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/PaymentCreateResult" } } }] } } } },
+      "PaymentStatusResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/PaymentStatus" } } }] } } } },
+      "PageNotificationResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/PageResultNotification" } } }] } } } },
+      "ReleaseLandResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/ReleaseLandResult" } } }] } } } },
+      "AdminStatsResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/AdminStats" } } }] } } } },
+      "AdminUserListResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/AdminInfo" } } } }] } } } },
+      "AlertListResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/AlertDetail" } } } }] } } } },
+      "DeviceListResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/Device" } } } }] } } } },
+      "DeviceSecretResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "type": "string", "description": "新的设备密钥" } } }] } } } },
+      "PageClaimLandResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/PageResultClaimLand" } } }] } } } }
+    },
+    "schemas": {
+      "ApiResult": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "integer", "description": "0 表示成功，401 未登录，403 无权限或设备鉴权失败，500 服务端错误", "example": 0 },
+          "msg": { "type": "string", "example": "success" },
+          "data": { "nullable": true }
+        },
+        "required": ["code", "msg"]
+      },
+      "ApiResultEmpty": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ApiResult" },
+          { "type": "object", "properties": { "data": { "nullable": true, "example": null } } }
+        ]
+      },
+      "WxLoginRequest": { "type": "object", "required": ["code"], "properties": { "code": { "type": "string", "description": "wx.login 获取的临时 code" } } },
+      "BindPhoneRequest": { "type": "object", "required": ["code"], "properties": { "code": { "type": "string", "description": "getPhoneNumber 获取的 code" } } },
+      "AdminLoginRequest": { "type": "object", "required": ["username", "password"], "properties": { "username": { "type": "string" }, "password": { "type": "string", "format": "password" } } },
+      "UserUpdateRequest": { "type": "object", "properties": { "nickname": { "type": "string" }, "avatar": { "type": "string" } } },
+      "ChangePasswordRequest": { "type": "object", "required": ["oldPassword", "newPassword"], "properties": { "oldPassword": { "type": "string", "format": "password" }, "newPassword": { "type": "string", "format": "password" } } },
+      "ResetPasswordRequest": { "type": "object", "required": ["newPassword"], "properties": { "newPassword": { "type": "string", "format": "password" } } },
+      "UpdateStatusRequest": { "type": "object", "required": ["status"], "properties": { "status": { "type": "integer", "enum": [0, 1], "description": "0 禁用，1 启用" } } },
+      "HandleAlertRequest": { "type": "object", "properties": { "remark": { "type": "string" } } },
+      "LoginResult": { "type": "object", "properties": { "token": { "type": "string" }, "tokenExpire": { "type": "string", "format": "date-time" }, "isNewUser": { "type": "boolean" }, "userInfo": { "$ref": "#/components/schemas/UserInfo" } } },
+      "AdminLoginResult": { "type": "object", "properties": { "token": { "type": "string" }, "tokenExpire": { "type": "string", "format": "date-time" }, "adminInfo": { "$ref": "#/components/schemas/AdminInfo" } } },
+      "PhoneBindResult": { "type": "object", "properties": { "phone": { "type": "string" } } },
+      "UserInfo": { "type": "object", "properties": { "userId": { "type": "integer", "format": "int64" }, "nickname": { "type": "string" }, "avatar": { "type": "string" }, "phone": { "type": "string", "nullable": true }, "claimCount": { "type": "integer" }, "orderCount": { "type": "integer" }, "createTime": { "type": "string", "format": "date-time", "nullable": true } } },
+      "AdminInfo": { "type": "object", "properties": { "adminId": { "type": "integer", "format": "int64" }, "username": { "type": "string" }, "role": { "type": "string", "enum": ["SUPER_ADMIN", "ADMIN"] } } },
+      "LandStatus": { "type": "string", "enum": ["AVAILABLE", "CLAIMED"] },
+      "LandStatusFilter": { "type": "string", "enum": ["AVAILABLE", "CLAIMED", "ALL"], "default": "ALL" },
+      "OrderStatus": { "type": "string", "enum": ["PENDING_PAY", "PAID", "PROCESSING", "COMPLETED", "CANCELLED"] },
+      "ServiceType": { "type": "string", "enum": ["WATER", "FERTILIZE"] },
+      "PaymentState": { "type": "string", "enum": ["PENDING", "SUCCESS", "FAILED"] },
+      "NotificationType": { "type": "string", "enum": ["SYSTEM", "SERVICE", "PAY", "ALERT"] },
+      "MonitorLatest": { "type": "object", "properties": { "temperature": { "type": "number" }, "humidity": { "type": "number" }, "soilMoisture": { "type": "number" }, "lightIntensity": { "type": "number" }, "updateTime": { "type": "string", "format": "date-time" } } },
+      "ServicePrice": { "type": "object", "properties": { "waterPrice": { "type": "number" }, "fertilizePrice": { "type": "number" }, "priceUnit": { "type": "string", "example": "元/次" } } },
+      "Land": { "type": "object", "properties": { "landId": { "type": "integer", "format": "int64" }, "landName": { "type": "string" }, "zone": { "type": "string" }, "area": { "type": "number" }, "areaUnit": { "type": "string", "example": "㎡" }, "image": { "type": "string" }, "images": { "type": "array", "items": { "type": "string" } }, "status": { "$ref": "#/components/schemas/LandStatus" }, "statusName": { "type": "string" }, "price": { "type": "number" }, "priceUnit": { "type": "string", "example": "元/年" }, "soilType": { "type": "string" }, "cropType": { "type": "string" }, "description": { "type": "string" }, "claimUser": { "nullable": true }, "claimTime": { "type": "string", "format": "date-time", "nullable": true }, "claimExpireTime": { "type": "string", "format": "date-time", "nullable": true }, "latestMonitor": { "$ref": "#/components/schemas/MonitorLatest" }, "servicePrice": { "$ref": "#/components/schemas/ServicePrice" } } },
+      "LandUpsertRequest": { "type": "object", "required": ["landName", "zone", "area", "price"], "properties": { "landName": { "type": "string" }, "zone": { "type": "string" }, "area": { "type": "number" }, "price": { "type": "number" }, "description": { "type": "string" }, "images": { "type": "array", "items": { "type": "string" } } } },
+      "ReleaseLandRequest": { "type": "object", "properties": { "reason": { "type": "string" } } },
+      "ReleaseLandResult": { "type": "object", "properties": { "landId": { "type": "integer", "format": "int64" }, "status": { "$ref": "#/components/schemas/LandStatus" }, "statusName": { "type": "string" }, "reason": { "type": "string" } } },
+      "ClaimLandRequest": { "type": "object", "required": ["duration"], "properties": { "duration": { "type": "integer", "enum": [1, 3, 6, 12], "description": "认领时长，单位：月" } } },
+      "ClaimResult": { "type": "object", "properties": { "claimId": { "type": "integer", "format": "int64" }, "landId": { "type": "integer", "format": "int64" }, "landName": { "type": "string" }, "duration": { "type": "integer" }, "amount": { "type": "number" }, "paymentNo": { "type": "string" }, "status": { "$ref": "#/components/schemas/OrderStatus" }, "expireTime": { "type": "string", "format": "date-time" } } },
+      "ClaimLandItem": { "type": "object", "properties": { "claimId": { "type": "integer", "format": "int64" }, "landId": { "type": "integer", "format": "int64" }, "landName": { "type": "string" }, "landImage": { "type": "string" }, "area": { "type": "number" }, "areaUnit": { "type": "string" }, "claimTime": { "type": "string", "format": "date-time" }, "expireTime": { "type": "string", "format": "date-time" }, "status": { "$ref": "#/components/schemas/OrderStatus" } } },
+      "LandMonitor": { "type": "object", "properties": { "landId": { "type": "integer", "format": "int64" }, "landName": { "type": "string" }, "latest": { "$ref": "#/components/schemas/MonitorLatest" }, "history": { "type": "array", "items": { "$ref": "#/components/schemas/MonitorLatest" } } } },
+      "MonitorReportRequest": { "type": "object", "required": ["landId"], "properties": { "landId": { "type": "integer", "format": "int64" }, "temperature": { "type": "number" }, "humidity": { "type": "number" }, "soilMoisture": { "type": "number" }, "lightIntensity": { "type": "number" } } },
+      "Alert": { "type": "object", "properties": { "alertId": { "type": "integer", "format": "int64" }, "metric": { "type": "string", "enum": ["temperature", "humidity", "soilMoisture", "lightIntensity"] }, "value": { "type": "number" }, "message": { "type": "string" } } },
+      "MonitorReportResult": { "type": "object", "properties": { "landId": { "type": "integer", "format": "int64" }, "latest": { "$ref": "#/components/schemas/MonitorLatest" }, "alerts": { "type": "array", "items": { "$ref": "#/components/schemas/Alert" } } } },
+      "ServiceOrderRequest": { "type": "object", "required": ["landId", "serviceType"], "properties": { "landId": { "type": "integer", "format": "int64" }, "serviceType": { "$ref": "#/components/schemas/ServiceType" }, "quantity": { "type": "integer", "default": 1, "minimum": 1 }, "remark": { "type": "string" } } },
+      "CompleteOrderRequest": { "type": "object", "properties": { "completeImages": { "type": "array", "items": { "type": "string" } }, "completeRemark": { "type": "string" } } },
+      "Operator": { "type": "object", "nullable": true, "properties": { "adminId": { "type": "integer", "format": "int64" }, "adminName": { "type": "string" } } },
+      "Order": { "type": "object", "properties": { "orderId": { "type": "integer", "format": "int64" }, "orderNo": { "type": "string" }, "userId": { "type": "integer", "format": "int64" }, "landId": { "type": "integer", "format": "int64" }, "landName": { "type": "string" }, "serviceType": { "$ref": "#/components/schemas/ServiceType" }, "serviceTypeName": { "type": "string" }, "quantity": { "type": "integer" }, "amount": { "type": "number" }, "remark": { "type": "string" }, "status": { "$ref": "#/components/schemas/OrderStatus" }, "statusName": { "type": "string" }, "createTime": { "type": "string", "format": "date-time" }, "payTime": { "type": "string", "format": "date-time", "nullable": true }, "startTime": { "type": "string", "format": "date-time", "nullable": true }, "endTime": { "type": "string", "format": "date-time", "nullable": true }, "updateTime": { "type": "string", "format": "date-time", "nullable": true }, "acceptTime": { "type": "string", "format": "date-time", "nullable": true }, "completeTime": { "type": "string", "format": "date-time", "nullable": true }, "operator": { "$ref": "#/components/schemas/Operator" }, "completeImages": { "type": "array", "items": { "type": "string" } }, "completeRemark": { "type": "string" } } },
+      "OrderStatusResult": { "type": "object", "properties": { "orderId": { "type": "integer", "format": "int64" }, "status": { "$ref": "#/components/schemas/OrderStatus" }, "statusName": { "type": "string" }, "acceptTime": { "type": "string", "format": "date-time", "nullable": true } } },
+      "OrderCompleteResult": { "type": "object", "properties": { "orderId": { "type": "integer", "format": "int64" }, "status": { "$ref": "#/components/schemas/OrderStatus" }, "statusName": { "type": "string" }, "completeTime": { "type": "string", "format": "date-time" }, "completeImages": { "type": "array", "items": { "type": "string" } }, "completeRemark": { "type": "string" } } },
+      "PaymentCreateRequest": { "type": "object", "required": ["orderId", "amount"], "properties": { "orderId": { "type": "integer", "format": "int64" }, "amount": { "type": "number" }, "payType": { "type": "string", "enum": ["LAND", "SERVICE"], "default": "SERVICE" } } },
+      "WechatPayParams": { "type": "object", "properties": { "timeStamp": { "type": "string" }, "nonceStr": { "type": "string" }, "package": { "type": "string", "example": "prepay_id=wx..." }, "signType": { "type": "string", "example": "RSA" }, "paySign": { "type": "string" } } },
+      "PaymentCreateResult": { "type": "object", "properties": { "paymentId": { "type": "integer", "format": "int64" }, "paymentNo": { "type": "string" }, "amount": { "type": "number" }, "wxPayParams": { "$ref": "#/components/schemas/WechatPayParams" } } },
+      "PaymentStatus": { "type": "object", "properties": { "paymentId": { "type": "integer", "format": "int64" }, "paymentNo": { "type": "string" }, "amount": { "type": "number" }, "status": { "$ref": "#/components/schemas/PaymentState" }, "statusName": { "type": "string" }, "payTime": { "type": "string", "format": "date-time", "nullable": true }, "payMethod": { "type": "string", "example": "WECHAT" } } },
+      "WechatPayNotifyRequest": { "type": "object", "description": "微信支付 API v3 通知原始 JSON。开发环境也允许 { paymentId, status } 简化体。", "additionalProperties": true },
+      "NotificationItem": { "type": "object", "properties": { "notificationId": { "type": "integer", "format": "int64" }, "title": { "type": "string" }, "content": { "type": "string" }, "type": { "$ref": "#/components/schemas/NotificationType" }, "isRead": { "type": "boolean" }, "createTime": { "type": "string", "format": "date-time" }, "extra": { "type": "string", "description": "JSON 字符串" } } },
+      "AdminStats": { "type": "object", "properties": { "totalLands": { "type": "integer" }, "claimedLands": { "type": "integer" }, "totalUsers": { "type": "integer" }, "totalOrders": { "type": "integer" }, "pendingOrders": { "type": "integer" }, "todayRevenue": { "type": "number" }, "monthRevenue": { "type": "number" }, "serviceTypeStats": { "type": "object", "properties": { "waterCount": { "type": "integer" }, "fertilizeCount": { "type": "integer" } } } } },
+      "AlertDetail": { "allOf": [{ "$ref": "#/components/schemas/Alert" }, { "type": "object", "properties": { "landId": { "type": "integer", "format": "int64" }, "handled": { "type": "integer", "enum": [0, 1] }, "createTime": { "type": "string", "format": "date-time" } } }] },
+      "Device": { "type": "object", "properties": { "deviceId": { "type": "integer", "format": "int64" }, "landId": { "type": "integer", "format": "int64" }, "name": { "type": "string" }, "type": { "type": "string" }, "sn": { "type": "string" }, "status": { "type": "integer", "enum": [0, 1] }, "createTime": { "type": "string", "format": "date-time" } } },
+      "PageResultLand": { "type": "object", "properties": { "list": { "type": "array", "items": { "$ref": "#/components/schemas/Land" } }, "total": { "type": "integer" }, "page": { "type": "integer" }, "size": { "type": "integer" } } },
+      "PageResultClaimLand": { "type": "object", "properties": { "list": { "type": "array", "items": { "$ref": "#/components/schemas/ClaimLandItem" } }, "total": { "type": "integer" }, "page": { "type": "integer" }, "size": { "type": "integer" } } },
+      "PageResultOrder": { "type": "object", "properties": { "list": { "type": "array", "items": { "$ref": "#/components/schemas/Order" } }, "total": { "type": "integer" }, "page": { "type": "integer" }, "size": { "type": "integer" } } },
+      "PageResultNotification": { "type": "object", "properties": { "list": { "type": "array", "items": { "$ref": "#/components/schemas/NotificationItem" } }, "total": { "type": "integer" }, "page": { "type": "integer" }, "size": { "type": "integer" }, "unreadCount": { "type": "integer" } } }
     }
-  },
-  "servers": [],
-  "security": [
-    {
-      "BearerAuth": []
-    }
-  ]
+  }
 }

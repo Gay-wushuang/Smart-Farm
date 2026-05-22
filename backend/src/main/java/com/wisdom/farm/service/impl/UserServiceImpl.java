@@ -68,8 +68,9 @@ public class UserServiceImpl implements UserService {
     public UserInfoVO getCurrentUser() {
         User user = getCurrentUserEntity();
         UserInfoVO data = ApiViewUtil.userInfo(user);
-        data.setClaimCount(0);
-        data.setOrderCount(0);
+        Long userId = UserContext.requireUserId();
+        data.setClaimCount(userMapper.countClaimsByUserId(userId));
+        data.setOrderCount(userMapper.countOrdersByUserId(userId));
         data.setCreateTime(user == null ? null : user.getCreateTime());
         return data;
     }

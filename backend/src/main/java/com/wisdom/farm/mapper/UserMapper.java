@@ -17,4 +17,8 @@ public interface UserMapper {
     int updatePhone(@Param("id") Long id, @Param("phone") String phone);
 
     long count();
+
+    int countClaimsByUserId(@Param("userId") Long userId);
+
+    int countOrdersByUserId(@Param("userId") Long userId);
 }

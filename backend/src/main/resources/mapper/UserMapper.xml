@@ -46,4 +46,14 @@
     <select id="count" resultType="long">
         SELECT COUNT(*) FROM `user`
     </select>
+
+    <select id="countClaimsByUserId" resultType="int">
+        SELECT COUNT(*) FROM `order`
+        WHERE user_id = #{userId} AND status_text != 'CANCELLED'
+    </select>
+
+    <select id="countOrdersByUserId" resultType="int">
+        SELECT COUNT(*) FROM `order`
+        WHERE user_id = #{userId}
+    </select>
 </mapper>

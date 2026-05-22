@@ -20,4 +20,22 @@
         FROM device
         WHERE sn = #{sn}
     </select>
+
+    <select id="selectById" resultMap="DeviceResultMap">
+        SELECT id, land_id, name, type, sn, secret, status, create_time, update_time
+        FROM device
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="DeviceResultMap">
+        SELECT id, land_id, name, type, sn, secret, status, create_time, update_time
+        FROM device
+        ORDER BY create_time DESC
+    </select>
+
+    <update id="resetSecret">
+        UPDATE device
+        SET secret = #{secret}, update_time = NOW()
+        WHERE id = #{id}
+    </update>
 </mapper>
