@@ -1,8 +1,10 @@
 package com.wisdom.farm.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 
 @Data
 public class HandleAlertRequest {
-    private String handleRemark;
+    @JsonAlias("handleRemark")
+    private String remark;
 }

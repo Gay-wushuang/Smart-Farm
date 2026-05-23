@@ -24,6 +24,17 @@
     { "name": "告警" }
   ],
   "paths": {
+    "/": {
+      "get": {
+        "tags": ["健康检查"],
+        "summary": "服务健康检查",
+        "description": "用于确认后端服务是否启动，不需要登录。",
+        "security": [],
+        "responses": {
+          "200": { "$ref": "#/components/responses/HealthResponse" }
+        }
+      }
+    },
     "/auth/wx-login": {
       "post": {
         "tags": ["认证"],
@@ -657,6 +668,7 @@
     },
     "responses": {
       "EmptyResponse": { "description": "成功", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiResultEmpty" } } } },
+      "HealthResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/Health" } } }] } } } },
       "LoginResultResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/LoginResult" } } }] } } } },
       "AdminLoginResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/AdminLoginResult" } } }] } } } },
       "PhoneBindResponse": { "description": "成功", "content": { "application/json": { "schema": { "allOf": [{ "$ref": "#/components/schemas/ApiResult" }, { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/PhoneBindResult" } } }] } } } },
@@ -697,6 +709,7 @@
           { "type": "object", "properties": { "data": { "nullable": true, "example": null } } }
         ]
       },
+      "Health": { "type": "object", "properties": { "name": { "type": "string", "example": "wisdom-farm" }, "status": { "type": "string", "example": "running" }, "swagger": { "type": "string", "example": "/swagger-ui.html" }, "apiDocs": { "type": "string", "example": "/v3/api-docs" } } },
       "WxLoginRequest": { "type": "object", "required": ["code"], "properties": { "code": { "type": "string", "description": "wx.login 获取的临时 code" } } },
       "BindPhoneRequest": { "type": "object", "required": ["code"], "properties": { "code": { "type": "string", "description": "getPhoneNumber 获取的 code" } } },
       "AdminLoginRequest": { "type": "object", "required": ["username", "password"], "properties": { "username": { "type": "string" }, "password": { "type": "string", "format": "password" } } },
