@@ -1,0 +1,4 @@
+.empty { padding: 80rpx 32rpx; text-align: center; color: #778273; }
+.empty-mark { width: 92rpx; height: 92rpx; margin: 0 auto 22rpx; border-radius: 50%; background: linear-gradient(145deg, #dcebd6, #f8fbf6); }
+.empty-title { color: #465440; font-size: 30rpx; font-weight: 700; }
+.empty-desc { margin-top: 10rpx; font-size: 24rpx; }

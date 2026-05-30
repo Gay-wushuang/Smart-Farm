@@ -1,0 +1,29 @@
+page {
+  min-height: 100%;
+  background: #f5f8f3;
+  color: #172016;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 28rpx;
+}
+
+view, text, button, input, textarea { box-sizing: border-box; }
+image { display: block; }
+button { margin: 0; padding: 0; border-radius: 0; background: transparent; line-height: normal; }
+button::after { border: none; }
+
+.page { min-height: 100vh; padding: 28rpx; background: #f5f8f3; }
+.section { margin-top: 28rpx; }
+.panel { border: 1rpx solid #e4eadf; border-radius: 16rpx; background: #fff; box-shadow: 0 10rpx 28rpx rgba(47, 91, 54, .06); }
+.title-row { display: flex; align-items: center; justify-content: space-between; gap: 20rpx; }
+.h1 { color: #172016; font-size: 42rpx; font-weight: 700; }
+.h2 { color: #172016; font-size: 34rpx; font-weight: 700; }
+.muted { color: #778273; }
+.primary-button, .ghost-button { height: 92rpx; display: flex; align-items: center; justify-content: center; border-radius: 14rpx; font-size: 30rpx; font-weight: 700; }
+.primary-button { background: #2f8f46; color: #fff; }
+.primary-button[disabled], .disabled-button { background: #cbd8c5; color: #fff; }
+.ghost-button { border: 1rpx solid #cfe0ca; background: #fff; color: #2f8f46; }
+.field { margin-top: 20rpx; }
+.field-label { margin-bottom: 12rpx; color: #5c6a57; font-size: 26rpx; }
+.input, .textarea, .picker-value { width: 100%; min-height: 88rpx; padding: 0 24rpx; border: 1rpx solid #dfe8da; border-radius: 14rpx; background: #fff; color: #172016; }
+.textarea { min-height: 180rpx; padding-top: 22rpx; }
+.safe-bottom { padding-bottom: calc(28rpx + env(safe-area-inset-bottom)); }

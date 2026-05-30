@@ -1,0 +1,153 @@
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  background: #ffffff;
+  border-top: 1rpx solid #e4eadf;
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 999;
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 98rpx;
+  position: relative;
+}
+
+.tab-icon {
+  width: 44rpx;
+  height: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rpx;
+}
+
+.tab-text {
+  font-size: 20rpx;
+  color: #9aa594;
+}
+
+.tab-item.active .tab-text {
+  color: #2f8f46;
+  font-weight: 700;
+}
+
+/* CSS-drawn icons */
+.icon {
+  width: 36rpx;
+  height: 36rpx;
+  border: 3rpx solid #9aa594;
+  border-radius: 3rpx;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.tab-item.active .icon {
+  border-color: #2f8f46;
+  background: #e6f6e9;
+}
+
+/* Home icon */
+.icon-home {
+  width: 18rpx;
+  height: 20rpx;
+  border: 3rpx solid #9aa594;
+  border-bottom: none;
+  border-radius: 2rpx;
+  position: relative;
+  margin-top: -8rpx;
+}
+.icon-home::after {
+  content: '';
+  position: absolute;
+  bottom: -14rpx;
+  left: -5rpx;
+  width: 28rpx;
+  height: 8rpx;
+  border: 3rpx solid #9aa594;
+  border-radius: 2rpx;
+}
+.tab-item.active .icon-home,
+.tab-item.active .icon-home::after {
+  border-color: #2f8f46;
+}
+
+/* Land icon */
+.icon-land {
+  width: 28rpx;
+  height: 18rpx;
+  border: 3rpx solid #9aa594;
+  border-radius: 2rpx;
+  position: relative;
+}
+.icon-land::after {
+  content: '';
+  position: absolute;
+  top: -10rpx;
+  left: 4rpx;
+  width: 14rpx;
+  height: 10rpx;
+  border: 3rpx solid #9aa594;
+  border-bottom: none;
+  border-radius: 2rpx 2rpx 0 0;
+}
+.tab-item.active .icon-land,
+.tab-item.active .icon-land::after {
+  border-color: #2f8f46;
+}
+
+/* Bell icon */
+.icon-bell {
+  width: 24rpx;
+  height: 26rpx;
+  border: 3rpx solid #9aa594;
+  border-radius: 50% 50% 4rpx 4rpx;
+  position: relative;
+}
+.icon-bell::after {
+  content: '';
+  position: absolute;
+  top: 2rpx;
+  left: 8rpx;
+  width: 6rpx;
+  height: 6rpx;
+  border-radius: 50%;
+  background: #9aa594;
+}
+.tab-item.active .icon-bell,
+.tab-item.active .icon-bell::after {
+  border-color: #2f8f46;
+  background-color: #2f8f46;
+}
+
+/* User icon */
+.icon-user {
+  width: 24rpx;
+  height: 24rpx;
+  border: 3rpx solid #9aa594;
+  border-radius: 50%;
+  position: relative;
+  margin-top: -10rpx;
+}
+.icon-user::after {
+  content: '';
+  position: absolute;
+  bottom: -14rpx;
+  left: -12rpx;
+  width: 48rpx;
+  height: 16rpx;
+  border: 3rpx solid #9aa594;
+  border-radius: 50%;
+  border-top: none;
+}
+.tab-item.active .icon-user,
+.tab-item.active .icon-user::after {
+  border-color: #2f8f46;
+}

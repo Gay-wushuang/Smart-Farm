@@ -1,0 +1,9 @@
+.card { overflow: hidden; border: 1rpx solid #e4eadf; border-radius: 16rpx; background: #fff; box-shadow: 0 10rpx 28rpx rgba(47, 91, 54, .06); }
+.cover { width: 100%; height: 260rpx; background: #dfe8da; }
+.content { padding: 24rpx; }
+.title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 18rpx; }
+.name { color: #172016; font-size: 32rpx; font-weight: 800; }
+.code { margin-top: 8rpx; color: #778273; font-size: 23rpx; }
+.meta { display: flex; justify-content: space-between; gap: 18rpx; margin-top: 22rpx; color: #5f6f59; font-size: 24rpx; }
+.price { margin-top: 18rpx; color: #2f8f46; font-size: 36rpx; font-weight: 800; }
+.price text { margin-left: 8rpx; color: #778273; font-size: 22rpx; font-weight: 500; }

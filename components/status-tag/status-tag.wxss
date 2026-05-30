@@ -1,0 +1,6 @@
+.tag { display: inline-flex; align-items: center; height: 42rpx; padding: 0 16rpx; border-radius: 999rpx; font-size: 22rpx; font-weight: 700; }
+.tag-default { background: #edf4e9; color: #4e6848; }
+.tag-available { background: #e6f6e9; color: #2f8f46; }
+.tag-rented { background: #eef1f5; color: #657083; }
+.tag-warning { background: #fff4d8; color: #b46b00; }
+.tag-danger { background: #ffe9e5; color: #c3412e; }

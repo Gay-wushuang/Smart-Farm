@@ -1,0 +1,41 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/my-land/index",
+    "pages/message/index",
+    "pages/profile/index",
+    "pages/land-detail/index",
+    "pages/order-confirm/index",
+    "pages/pay-success/index",
+    "pages/my-land-detail/index",
+    "pages/monitor/index",
+    "pages/fertilizer/index",
+    "pages/appointment/index",
+    "pages/appointment-list/index",
+    "pages/rental-records/index",
+    "pages/bills/index",
+    "pages/consumable-orders/index",
+    "pages/login/index",
+    "pages/bind-phone/index",
+    "pages/settings/index",
+    "pages/contact/index",
+    "pages/message-detail/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "土地监测",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f5f8f3"
+  },
+  "tabBar": {
+    "custom": true,
+    "list": [
+      { "pagePath": "pages/index/index", "text": "首页" },
+      { "pagePath": "pages/my-land/index", "text": "我的土地" },
+      { "pagePath": "pages/message/index", "text": "消息" },
+      { "pagePath": "pages/profile/index", "text": "我的" }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
