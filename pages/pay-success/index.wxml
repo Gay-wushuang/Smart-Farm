@@ -1,0 +1,7 @@
+<view class="page done">
+  <view class="mark">✓</view>
+  <view class="h1">支付成功</view>
+  <view class="muted">订单已提交，后续状态可在个人中心查看。</view>
+  <button class="primary-button" bindtap="goHome">返回首页</button>
+  <button class="ghost-button" bindtap="goMine">查看我的土地</button>
+</view>

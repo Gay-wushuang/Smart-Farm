@@ -1,0 +1,13 @@
+<view class="page safe-bottom">
+  <view class="panel user">
+    <view class="avatar">{{avatarText}}</view>
+    <view>
+      <view class="h2">{{logged ? (user.nickname || user.nickName || '微信用户') : '游客模式'}}</view>
+      <view class="muted">{{logged ? (user.phone || '未绑定手机号') : '登录后可租赁、支付和预约服务'}}</view>
+    </view>
+    <button wx:if="{{!logged}}" class="login" bindtap="login">登录</button>
+  </view>
+  <view class="menu panel">
+    <view wx:for="{{menus}}" wx:key="text" class="menu-item" data-url="{{item.url}}" bindtap="open"><text>{{item.text}}</text><text>›</text></view>
+  </view>
+</view>

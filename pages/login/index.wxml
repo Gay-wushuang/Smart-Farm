@@ -1,0 +1,8 @@
+<view class="page">
+  <view class="login-card panel">
+    <view class="brand">田</view>
+    <view class="h1">微信授权登录</view>
+    <view class="muted">登录后可完成土地租赁、支付、监控查看和人工服务预约。</view>
+    <button class="primary-button" loading="{{loading}}" bindtap="login">微信一键登录</button>
+  </view>
+</view>

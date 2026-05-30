@@ -1,0 +1,11 @@
+<view class="page safe-bottom">
+  <view class="h1">确认订单</view>
+  <view class="panel order">
+    <view class="row"><text>土地</text><text class="strong">{{land.landName || '-'}}</text></view>
+    <view class="row"><text>编号</text><text class="strong">{{land.landNo || land.landId || id}}</text></view>
+    <view class="row"><text>面积</text><text class="strong">{{land.area || '-'}}{{land.areaUnit || '㎡'}}</text></view>
+    <view class="row"><text>租赁周期</text><text class="strong">1 年</text></view>
+    <view class="row total"><text>应付金额</text><text class="strong">¥{{price}}</text></view>
+  </view>
+  <button class="primary-button action" loading="{{submitting}}" bindtap="pay">微信支付</button>
+</view>

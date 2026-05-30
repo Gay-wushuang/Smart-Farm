@@ -1,0 +1,6 @@
+<view class="page">
+  <view class="panel detail">
+    <view class="h2">{{title}}</view>
+    <view class="content">{{content}}</view>
+  </view>
+</view>

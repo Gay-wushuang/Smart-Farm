@@ -1,0 +1,12 @@
+<view class="page safe-bottom">
+  <view class="h1">消息通知</view>
+  <view class="tabs"><button wx:for="{{tabs}}" wx:key="value" class="tab {{active === item.value ? 'active' : ''}}" data-value="{{item.value}}" bindtap="switchType">{{item.label}}</button></view>
+  <view class="list" wx:if="{{messages.length}}">
+    <view class="panel msg" wx:for="{{messages}}" wx:key="notificationId" data-item="{{item}}" bindtap="open">
+      <view class="title-row"><view class="name">{{item.title || item.type}}</view><view class="dot" wx:if="{{!item.read}}"></view></view>
+      <view class="desc">{{item.content || item.message}}</view>
+      <view class="time">{{item.createTime}}</view>
+    </view>
+  </view>
+  <empty-state wx:else title="暂无消息" desc="系统公告、到期提醒和服务进度会在这里出现"></empty-state>
+</view>

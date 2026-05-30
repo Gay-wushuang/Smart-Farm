@@ -1,0 +1,9 @@
+<view class="page">
+  <view class="h1">联系客服</view>
+  <view class="panel contact">
+    <image class="qr" src="/assets/images/contact-qr.svg" />
+    <view class="h2">微信客服：{{wechat}}</view>
+    <view class="muted">电话：{{phone}}</view>
+    <button class="primary-button" bindtap="call">拨打电话</button>
+  </view>
+</view>

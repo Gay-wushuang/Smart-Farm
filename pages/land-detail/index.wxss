@@ -1,0 +1,8 @@
+.hero { width: 100%; height: 430rpx; border-radius: 18rpx; background: #dfe8da; }
+.detail { margin-top: 24rpx; padding: 28rpx; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22rpx; margin-top: 28rpx; }
+.grid view { padding: 22rpx; border-radius: 14rpx; background: #f7faf5; }
+.grid text { display: block; color: #778273; font-size: 24rpx; }
+.grid .strong { display: block; margin-top: 8rpx; color: #172016; font-size: 30rpx; }
+.action { margin-top: 28rpx; }
+.error { margin-top: 20rpx; color: #c3412e; text-align: center; }

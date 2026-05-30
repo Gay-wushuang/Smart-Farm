@@ -1,0 +1,11 @@
+<view class="page safe-bottom">
+  <view class="h1">人工预约</view>
+  <view class="panel form">
+    <view class="field"><view class="field-label">地块编号</view><input class="input" value="{{landId}}" disabled /></view>
+    <view class="field"><view class="field-label">服务类型</view><picker range="{{serviceTypes}}" range-key="label" bindchange="onServiceChange"><view class="picker-value">{{serviceTypes[serviceIndex].label}}</view></picker></view>
+    <view class="field"><view class="field-label">预约日期</view><picker mode="date" bindchange="onDateChange"><view class="picker-value">{{date || '请选择日期'}}</view></picker></view>
+    <view class="field"><view class="field-label">预约时间</view><picker mode="time" bindchange="onTimeChange"><view class="picker-value">{{time || '请选择时间'}}</view></picker></view>
+    <view class="field"><view class="field-label">备注</view><textarea class="textarea" placeholder="填写服务要求" bindinput="onRemarkInput"></textarea></view>
+  </view>
+  <button class="primary-button action" loading="{{submitting}}" bindtap="submit">提交预约</button>
+</view>

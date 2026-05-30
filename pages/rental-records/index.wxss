@@ -1,0 +1,1 @@
+.list { display: flex; flex-direction: column; gap: 18rpx; margin-top: 28rpx; }.item { padding: 26rpx; }.name { font-size: 30rpx; font-weight: 800; }.price { color: #2f8f46; font-weight: 800; }

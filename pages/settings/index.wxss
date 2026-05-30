@@ -1,0 +1,1 @@
+.menu { margin-top: 28rpx; padding: 0 24rpx; }.menu-item { min-height: 96rpx; display: flex; align-items: center; justify-content: space-between; border-bottom: 1rpx solid #edf1ea; }.menu-item:last-child { border-bottom: 0; }.menu-item text:last-child { color: #778273; }.logout { margin-top: 32rpx; color: #c3412e; }

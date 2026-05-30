@@ -1,0 +1,11 @@
+<view class="page safe-bottom">
+  <view class="h1">服务预约</view>
+  <view wx:if="{{orders.length}}" class="list">
+    <view class="panel item" wx:for="{{orders}}" wx:key="orderId">
+      <view class="title-row"><view class="name">{{item.serviceTypeName || item.serviceType}}</view><status-tag text="{{item.statusText}}" type="warning"></status-tag></view>
+      <view class="muted">{{item.landName || '土地'}} · {{item.createTime || '-'}}</view>
+      <view class="remark">{{item.remark}}</view>
+    </view>
+  </view>
+  <empty-state wx:else title="暂无预约" desc="预约播种、除草、施肥等人工服务后会展示在这里"></empty-state>
+</view>

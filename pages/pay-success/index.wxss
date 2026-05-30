@@ -1,0 +1,1 @@
+.done { text-align: center; padding-top: 150rpx; }.mark { width: 132rpx; height: 132rpx; margin: 0 auto 34rpx; border-radius: 50%; background: #2f8f46; color: #fff; line-height: 132rpx; font-size: 78rpx; font-weight: 800; }.muted { margin: 18rpx 0 48rpx; }.ghost-button { margin-top: 18rpx; }

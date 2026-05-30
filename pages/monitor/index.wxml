@@ -1,0 +1,9 @@
+<view class="page safe-bottom">
+  <view class="h1">实时监控</view>
+  <view class="panel player">
+    <video wx:if="{{videoUrl}}" src="{{videoUrl}}" controls autoplay object-fit="contain"></video>
+    <empty-state wx:else title="暂无视频画面" desc="请确认后端已返回可播放地址"></empty-state>
+  </view>
+  <view class="muted name">{{cameraName}}</view>
+  <view class="error" wx:if="{{error}}">{{error}}</view>
+</view>

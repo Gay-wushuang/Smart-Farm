@@ -1,0 +1,9 @@
+.tabs { display: flex; gap: 12rpx; margin-top: 24rpx; overflow-x: auto; }
+.tab { height: 64rpx; padding: 0 22rpx; border-radius: 999rpx; background: #fff; color: #5c6a57; font-size: 24rpx; }
+.tab.active { background: #2f8f46; color: #fff; }
+.list { display: flex; flex-direction: column; gap: 18rpx; margin-top: 24rpx; }
+.msg { padding: 24rpx; }
+.name { font-size: 30rpx; font-weight: 800; }
+.dot { width: 14rpx; height: 14rpx; border-radius: 50%; background: #e45d3f; }
+.desc { margin-top: 14rpx; color: #5c6a57; line-height: 1.5; }
+.time { margin-top: 14rpx; color: #9aa594; font-size: 22rpx; }

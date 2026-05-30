@@ -1,0 +1,1 @@
+{ "navigationBarTitleText": "土地认领", "enablePullDownRefresh": true, "usingComponents": { "land-card": "/components/land-card/land-card", "empty-state": "/components/empty-state/empty-state" } }

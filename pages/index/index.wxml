@@ -1,0 +1,23 @@
+<view class="page safe-bottom">
+  <view class="h1">土地认领</view>
+  <view class="search panel">
+    <input class="search-input" placeholder="搜索土地名称/编号" value="{{keyword}}" bindinput="onSearchInput" confirm-type="search" bindconfirm="onSearchConfirm" />
+    <button class="search-button" bindtap="onSearchConfirm">搜索</button>
+  </view>
+  <view class="filters">
+    <picker mode="selector" range="{{statusOptions}}" bindchange="onStatusChange"><view class="filter-chip">状态</view></picker>
+    <input class="filter-input" placeholder="区域" data-key="zone" bindinput="onFilterInput" bindconfirm="onSearchConfirm" />
+    <input class="filter-input" placeholder="最低价" type="number" data-key="minPrice" bindinput="onFilterInput" bindconfirm="onSearchConfirm" />
+    <input class="filter-input" placeholder="最高价" type="number" data-key="maxPrice" bindinput="onFilterInput" bindconfirm="onSearchConfirm" />
+    <input class="filter-input" placeholder="最小面积" type="number" data-key="minArea" bindinput="onFilterInput" bindconfirm="onSearchConfirm" />
+  </view>
+  <swiper class="banner" indicator-dots autoplay circular>
+    <swiper-item wx:for="{{banners}}" wx:key="*this"><image class="banner-img" src="{{item}}" mode="aspectFill" /></swiper-item>
+  </swiper>
+  <view class="section title-row"><view class="h2">推荐土地</view><view class="muted">{{lands.length}} 块</view></view>
+  <view class="land-list" wx:if="{{lands.length}}">
+    <land-card wx:for="{{lands}}" wx:key="landId" land="{{item}}" bind:tap="goDetail"></land-card>
+  </view>
+  <empty-state wx:else title="暂无土地" desc="请调整筛选条件或稍后再试"></empty-state>
+  <view class="error" wx:if="{{error}}">{{error}}</view>
+</view>

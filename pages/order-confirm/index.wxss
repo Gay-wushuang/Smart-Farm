@@ -1,0 +1,6 @@
+.order { margin-top: 28rpx; padding: 10rpx 28rpx; }
+.row { display: flex; align-items: center; justify-content: space-between; min-height: 92rpx; border-bottom: 1rpx solid #edf1ea; color: #778273; }
+.row:last-child { border-bottom: 0; }
+.row .strong { color: #172016; font-size: 30rpx; }
+.total .strong { color: #2f8f46; font-size: 38rpx; }
+.action { margin-top: 32rpx; }

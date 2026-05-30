@@ -1,0 +1,1 @@
+.login-card { margin-top: 120rpx; padding: 48rpx 34rpx; text-align: center; }.brand { width: 118rpx; height: 118rpx; margin: 0 auto 28rpx; border-radius: 32rpx; background: #2f8f46; color: #fff; line-height: 118rpx; font-size: 58rpx; font-weight: 900; }.muted { margin: 18rpx 0 40rpx; line-height: 1.6; }

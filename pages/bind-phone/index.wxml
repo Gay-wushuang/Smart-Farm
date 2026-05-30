@@ -1,0 +1,7 @@
+<view class="page">
+  <view class="login-card panel">
+    <view class="h1">绑定手机号</view>
+    <view class="muted">用于接收租赁到期、支付和服务进度通知。</view>
+    <button class="primary-button" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber" loading="{{loading}}">授权绑定手机号</button>
+  </view>
+</view>

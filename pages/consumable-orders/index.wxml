@@ -1,0 +1,10 @@
+<view class="page safe-bottom">
+  <view class="h1">消耗品订单</view>
+  <view class="list" wx:if="{{orders.length}}">
+    <view class="panel item" wx:for="{{orders}}" wx:key="orderId">
+      <view class="title-row"><view class="name">化肥 × {{item.quantity || 1}}</view><view class="price">¥{{item.amountText}}</view></view>
+      <view class="muted">{{item.landName || '土地'}} · {{item.statusName || item.status}}</view>
+    </view>
+  </view>
+  <empty-state wx:else title="暂无消耗品订单"></empty-state>
+</view>

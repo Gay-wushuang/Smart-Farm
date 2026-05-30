@@ -1,0 +1,10 @@
+<view class="page safe-bottom">
+  <view class="h1">租赁记录</view>
+  <view class="list" wx:if="{{orders.length}}">
+    <view class="panel item" wx:for="{{orders}}" wx:key="orderId">
+      <view class="title-row"><view class="name">{{item.landName || '土地租赁'}}</view><view class="price">¥{{item.amountText}}</view></view>
+      <view class="muted">{{item.orderNo}} · {{item.createTime}}</view>
+    </view>
+  </view>
+  <empty-state wx:else title="暂无租赁记录"></empty-state>
+</view>

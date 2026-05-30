@@ -1,0 +1,9 @@
+.search { margin-top: 24rpx; padding: 14rpx; display: flex; align-items: center; gap: 12rpx; }
+.search-input { flex: 1; height: 72rpx; padding: 0 18rpx; }
+.search-button { width: 120rpx; height: 72rpx; border-radius: 12rpx; background: #2f8f46; color: #fff; font-size: 26rpx; }
+.filters { display: flex; gap: 12rpx; margin-top: 18rpx; overflow-x: auto; white-space: nowrap; }
+.filter-chip, .filter-input { min-width: 130rpx; height: 64rpx; padding: 0 18rpx; border: 1rpx solid #dfe8da; border-radius: 999rpx; background: #fff; color: #53624e; font-size: 24rpx; line-height: 64rpx; }
+.banner { height: 260rpx; margin-top: 28rpx; border-radius: 18rpx; overflow: hidden; }
+.banner-img { width: 100%; height: 100%; }
+.land-list { display: flex; flex-direction: column; gap: 24rpx; margin-top: 18rpx; }
+.error { margin-top: 20rpx; color: #c3412e; text-align: center; }

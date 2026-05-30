@@ -1,0 +1,14 @@
+<view class="page safe-bottom">
+  <view class="h1">设置</view>
+  <view class="panel menu">
+    <view class="menu-item" bindtap="toggleNotification">
+      <text>消息提醒</text>
+      <text>{{notificationEnabled ? '已开启' : '已关闭'}}</text>
+    </view>
+    <view class="menu-item">
+      <text>主题</text>
+      <text>{{theme}}</text>
+    </view>
+  </view>
+  <button class="ghost-button logout" bindtap="logout">退出登录</button>
+</view>

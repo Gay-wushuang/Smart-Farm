@@ -1,0 +1,10 @@
+<view class="page safe-bottom">
+  <view class="h1">购买化肥</view>
+  <view class="panel box">
+    <view class="product-title">化肥</view>
+    <view class="muted">{{land.landName || '当前土地'}}</view>
+    <view class="price">¥{{unitPrice || 0}} / 袋</view>
+    <view class="stepper"><button bindtap="minus">-</button><text>{{quantity}}</text><button bindtap="plus">+</button></view>
+  </view>
+  <button class="primary-button action" loading="{{submitting}}" bindtap="pay">提交并支付</button>
+</view>

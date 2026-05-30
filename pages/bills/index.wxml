@@ -1,0 +1,10 @@
+<view class="page safe-bottom">
+  <view class="h1">费用账单</view>
+  <view class="list" wx:if="{{bills.length}}">
+    <view class="panel item" wx:for="{{bills}}" wx:key="orderId">
+      <view class="title-row"><view class="name">{{item.serviceTypeName || item.landName || '费用'}}</view><view class="price">¥{{item.amountText}}</view></view>
+      <view class="muted">土地租赁费 / 化肥购买费 / 人工服务费</view>
+    </view>
+  </view>
+  <empty-state wx:else title="暂无账单"></empty-state>
+</view>

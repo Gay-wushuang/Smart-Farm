@@ -1,0 +1,6 @@
+<view class="page safe-bottom">
+  <view class="title-row"><view class="h1">我的土地</view><view class="muted">{{lands.length}} 块</view></view>
+  <view class="land-list" wx:if="{{lands.length}}"><land-card wx:for="{{lands}}" wx:key="landId" land="{{item}}" bind:tap="goDetail"></land-card></view>
+  <empty-state wx:else title="暂无租赁土地" desc="认领后可在这里管理监控、服务和账单"></empty-state>
+  <view class="error" wx:if="{{error}}">{{error}}</view>
+</view>

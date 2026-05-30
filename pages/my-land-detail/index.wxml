@@ -1,0 +1,22 @@
+<view class="page safe-bottom">
+  <image class="hero" src="{{land.image || '/assets/images/land-default.svg'}}" mode="aspectFill" />
+  <view class="panel detail">
+    <view class="title-row">
+      <view>
+        <view class="h2">{{land.landName || '我的土地'}}</view>
+        <view class="muted">租期至 {{land.claimExpireTime || land.expireTime || '-'}}</view>
+      </view>
+      <status-tag text="{{statusText}}" type="warning"></status-tag>
+    </view>
+    <view class="summary">
+      <view><text>面积</text><text class="strong">{{land.area || '-'}}{{land.areaUnit || '㎡'}}</text></view>
+      <view><text>年租</text><text class="strong">¥{{price}}</text></view>
+    </view>
+  </view>
+  <view class="actions">
+    <button bindtap="goMonitor">实时监控</button>
+    <button bindtap="goFertilizer">购买化肥</button>
+    <button bindtap="goAppointment">预约服务</button>
+    <button bindtap="renew" loading="{{renewing}}">续租</button>
+  </view>
+</view>

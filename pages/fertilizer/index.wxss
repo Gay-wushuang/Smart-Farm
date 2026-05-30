@@ -1,0 +1,7 @@
+.box { margin-top: 28rpx; padding: 32rpx; }
+.product-title { font-size: 36rpx; font-weight: 800; }
+.price { margin-top: 28rpx; color: #2f8f46; font-size: 42rpx; font-weight: 800; }
+.stepper { display: flex; align-items: center; gap: 28rpx; margin-top: 30rpx; }
+.stepper button { width: 72rpx; height: 72rpx; border-radius: 12rpx; background: #edf4e9; color: #2f8f46; font-size: 38rpx; }
+.stepper text { min-width: 80rpx; text-align: center; font-size: 34rpx; font-weight: 700; }
+.action { margin-top: 32rpx; }
